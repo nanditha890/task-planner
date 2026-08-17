@@ -22,7 +22,6 @@ function isBeforeToday(dateString) {
 }
 
 export function TaskProvider({ children }) {
-
   const [tasks, setTasks] = useState([
     {
       id: 1,
@@ -81,16 +80,13 @@ export function TaskProvider({ children }) {
     },
   ]);
 
-
-  // ===============================
-  // CARRY OLD WORK AS DUE
-  // ===============================
+  // ==========================================
+  // CONVERT OLD UNFINISHED TASKS TO DUE
+  // ==========================================
 
   useEffect(() => {
-
     setTasks((currentTasks) =>
       currentTasks.map((task) => {
-
         if (
           !task.completed &&
           isBeforeToday(task.date)
@@ -104,19 +100,15 @@ export function TaskProvider({ children }) {
         return task;
       })
     );
-
   }, []);
 
-
-  // ===============================
+  // ==========================================
   // ADD TASK
-  // ===============================
+  // ==========================================
 
   const addTask = (newTask) => {
-
     setTasks((currentTasks) => [
       ...currentTasks,
-
       {
         ...newTask,
         id: Date.now(),
@@ -124,86 +116,113 @@ export function TaskProvider({ children }) {
         status: "pending",
       },
     ]);
-
   };
 
-
-  // ===============================
-  // COMPLETE / UNCOMPLETE
-  // ===============================
+  // ==========================================
+  // COMPLETE / UNCOMPLETE TASK
+  // ==========================================
 
   const toggleTask = (id) => {
-
     setTasks((currentTasks) =>
       currentTasks.map((task) => {
-
         if (task.id !== id) {
           return task;
         }
 
-        const completed = !task.completed;
+        const newCompletedState = !task.completed;
 
+        // If completing
+        if (newCompletedState) {
+          return {
+            ...task,
+            completed: true,
+            status: "completed",
+          };
+        }
+
+        // If uncompleting an old task,
+        // keep it as DUE.
+        if (isBeforeToday(task.date)) {
+          return {
+            ...task,
+            completed: false,
+            status: "due",
+          };
+        }
+
+        // Otherwise it is a normal pending task.
         return {
           ...task,
-          completed,
-          status: completed
-            ? "completed"
-            : "pending",
+          completed: false,
+          status: "pending",
         };
-
       })
     );
-
   };
 
-
-  // ===============================
+  // ==========================================
   // DELETE TASK
-  // ===============================
+  // ==========================================
 
   const deleteTask = (id) => {
-
     setTasks((currentTasks) =>
       currentTasks.filter(
         (task) => task.id !== id
       )
     );
-
   };
 
-
-  // ===============================
+  // ==========================================
   // UPDATE TASK
-  // ===============================
+  // ==========================================
 
   const updateTask = (id, updatedData) => {
-
     setTasks((currentTasks) =>
       currentTasks.map((task) => {
-
         if (task.id !== id) {
           return task;
+        }
+
+        let newStatus = task.status;
+
+        // If task is already completed,
+        // keep completed status.
+        if (task.completed) {
+          newStatus = "completed";
+        }
+
+        // If task is not completed and
+        // its date is in the past,
+        // make it due.
+        else if (isBeforeToday(updatedData.date)) {
+          newStatus = "due";
+        }
+
+        // Otherwise pending.
+        else {
+          newStatus = "pending";
         }
 
         return {
           ...task,
           ...updatedData,
+          status: newStatus,
         };
-
       })
     );
-
   };
 
-
-  // ===============================
-  // COUNTS
-  // ===============================
+  // ==========================================
+  // COMPLETED COUNT
+  // ==========================================
 
   const completedCount = tasks.filter(
     (task) => task.completed
   ).length;
 
+  // ==========================================
+  // DUE COUNT
+  // ==========================================
 
   const dueCount = tasks.filter(
     (task) =>
@@ -211,9 +230,11 @@ export function TaskProvider({ children }) {
       !task.completed
   ).length;
 
+  // ==========================================
+  // PROVIDER
+  // ==========================================
 
   return (
-
     <TaskContext.Provider
       value={{
         tasks,
@@ -225,14 +246,14 @@ export function TaskProvider({ children }) {
         dueCount,
       }}
     >
-
       {children}
-
     </TaskContext.Provider>
-
   );
 }
 
+// ==========================================
+// CUSTOM HOOK
+// ==========================================
 
 export function useTasks() {
   return useContext(TaskContext);
