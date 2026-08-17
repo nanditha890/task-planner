@@ -1,48 +1,76 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
 
 import Dashboard from "./pages/Dashboard";
 import CalendarPage from "./pages/CalendarPage";
 import TasksPage from "./pages/TasksPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import HistoryPage from "./pages/HistoryPage";
+import SettingsPage from "./pages/SettingsPage";
+
+import { TaskProvider } from "./context/TaskContext";
+
 
 function App() {
+
   return (
-    <BrowserRouter>
 
-      <div className="min-h-screen bg-gray-50">
+    <TaskProvider>
 
-        <Sidebar />
+      <BrowserRouter>
 
-        <main className="ml-64 min-h-screen p-8">
+        <div className="min-h-screen bg-gray-50">
 
-          <Routes>
+          <Sidebar />
 
-            {/* Dashboard */}
-            <Route
-              path="/"
-              element={<Dashboard />}
-            />
+          <main className="ml-64 min-h-screen p-8">
 
-            {/* Calendar */}
-            <Route
-              path="/calendar"
-              element={<CalendarPage />}
-            />
+            <Routes>
 
-            {/* Tasks */}
-            <Route
-              path="/tasks"
-              element={<TasksPage />}
-            />
+              <Route
+                path="/"
+                element={<Dashboard />}
+              />
 
-          </Routes>
+              <Route
+                path="/calendar"
+                element={<CalendarPage />}
+              />
 
-        </main>
+              <Route
+                path="/tasks"
+                element={<TasksPage />}
+              />
 
-      </div>
+              <Route
+                path="/analytics"
+                element={<AnalyticsPage />}
+              />
 
-    </BrowserRouter>
+              <Route
+                path="/history"
+                element={<HistoryPage />}
+              />
+
+              <Route
+                path="/settings"
+                element={<SettingsPage />}
+              />
+
+            </Routes>
+
+          </main>
+
+        </div>
+
+      </BrowserRouter>
+
+    </TaskProvider>
   );
 }
 

@@ -46,7 +46,7 @@ function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 border-r border-gray-200 bg-white p-5">
 
-      {/* Logo */}
+      {/* LOGO */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">
           TaskFlow
@@ -57,7 +57,7 @@ function Sidebar() {
         </p>
       </div>
 
-      {/* Navigation */}
+      {/* NAVIGATION */}
       <nav className="space-y-2">
 
         {menuItems.map((item) => {
@@ -68,11 +68,12 @@ function Sidebar() {
             <NavLink
               key={item.name}
               to={item.path}
+              end={item.path === "/"}
               className={({ isActive }) =>
                 `flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${
                   isActive
                     ? "bg-blue-50 text-blue-600"
-                    : "text-gray-600 hover:bg-gray-50"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`
               }
             >
@@ -81,6 +82,7 @@ function Sidebar() {
               <span>{item.name}</span>
             </NavLink>
           );
+
         })}
 
       </nav>

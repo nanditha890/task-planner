@@ -2,238 +2,483 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
 } from "react";
 
-const TaskContext = createContext();
+const TaskContext = createContext(null);
 
-function getToday() {
+/* =========================================================
+   GET TODAY
+========================================================= */
+
+export function getToday() {
   const today = new Date();
 
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
+
+  const month = String(
+    today.getMonth() + 1
+  ).padStart(2, "0");
+
+  const day = String(
+    today.getDate()
+  ).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 }
 
-function isBeforeToday(dateString) {
-  return dateString < getToday();
+
+/* =========================================================
+   TIMESTAMP
+========================================================= */
+
+function getTimestamp() {
+  return new Date().toISOString();
 }
+
+
+/* =========================================================
+   CHECK WHETHER DATE IS IN THE PAST
+========================================================= */
+
+function isPastDate(date) {
+  if (!date) {
+    return false;
+  }
+
+  return date < getToday();
+}
+
+
+/* =========================================================
+   GET INITIAL STATUS
+========================================================= */
+
+function getTaskStatus(date) {
+  if (isPastDate(date)) {
+    return "due";
+  }
+
+  return "pending";
+}
+
+
+/* =========================================================
+   TASK PROVIDER
+========================================================= */
 
 export function TaskProvider({ children }) {
 
   const [tasks, setTasks] = useState([
+
+    /* =====================================================
+       SAMPLE TASK 1
+    ===================================================== */
+
     {
       id: 1,
-      title: "Complete project documentation",
+
+      title: "Complete project report",
+
       description:
-        "Finish the documentation for the current project.",
+        "Finish the project documentation.",
+
       date: getToday(),
+
       time: "10:00",
+
       priority: "High",
-      reminder: "15",
+
+      reminder: 15,
+
       repeat: "Never",
+
       status: "pending",
+
       completed: false,
+
+      completedAt: null,
+
+      createdAt: getTimestamp(),
+
+      updatedAt: getTimestamp(),
     },
+
+
+    /* =====================================================
+       SAMPLE TASK 2
+    ===================================================== */
 
     {
       id: 2,
-      title: "Review API integration",
+
+      title: "Review yesterday's work",
+
       description:
-        "Check the API connection and test the responses.",
+        "Check the pending work from yesterday.",
+
       date: getToday(),
+
       time: "14:00",
+
       priority: "Medium",
-      reminder: "30",
+
+      reminder: 15,
+
       repeat: "Never",
+
       status: "pending",
+
       completed: false,
+
+      completedAt: null,
+
+      createdAt: getTimestamp(),
+
+      updatedAt: getTimestamp(),
     },
 
-    {
-      id: 3,
-      title: "Study React",
-      description:
-        "Learn React state and component communication.",
-      date: getToday(),
-      time: "19:00",
-      priority: "Low",
-      reminder: "15",
-      repeat: "Daily",
-      status: "pending",
-      completed: false,
-    },
-
-    {
-      id: 4,
-      title: "Finish yesterday's pending work",
-      description:
-        "This work was not completed yesterday.",
-      date: "2026-08-11",
-      time: "09:00",
-      priority: "High",
-      reminder: "15",
-      repeat: "Never",
-      status: "due",
-      completed: false,
-    },
   ]);
 
 
-  // ===============================
-  // CARRY OLD WORK AS DUE
-  // ===============================
+  /* =======================================================
+     ADD TASK
+  ======================================================= */
 
-  useEffect(() => {
+  const addTask = (taskData) => {
 
-    setTasks((currentTasks) =>
-      currentTasks.map((task) => {
+    const now = getTimestamp();
 
-        if (
-          !task.completed &&
-          isBeforeToday(task.date)
-        ) {
+    const taskDate =
+      taskData.date || getToday();
+
+    const newTask = {
+
+      id: Date.now(),
+
+      title:
+        taskData.title?.trim() || "",
+
+      description:
+        taskData.description?.trim() || "",
+
+      date: taskDate,
+
+      time:
+        taskData.time || "",
+
+      priority:
+        taskData.priority || "Medium",
+
+      reminder:
+        Number(taskData.reminder || 0),
+
+      repeat:
+        taskData.repeat || "Never",
+
+      status:
+        getTaskStatus(taskDate),
+
+      completed: false,
+
+      completedAt: null,
+
+      createdAt: now,
+
+      updatedAt: now,
+    };
+
+
+    setTasks((previousTasks) => [
+      ...previousTasks,
+      newTask,
+    ]);
+  };
+
+
+  /* =======================================================
+     UPDATE TASK
+  ======================================================= */
+
+  const updateTask = (
+    id,
+    updatedData
+  ) => {
+
+    setTasks((previousTasks) =>
+
+      previousTasks.map((task) => {
+
+        if (task.id !== id) {
+          return task;
+        }
+
+        const newDate =
+          updatedData.date ?? task.date;
+
+        let newStatus = task.status;
+
+        /*
+          If task is already completed,
+          keep it completed.
+        */
+
+        if (task.completed) {
+
+          newStatus = "completed";
+
+        } else {
+
+          newStatus =
+            getTaskStatus(newDate);
+
+        }
+
+        return {
+
+          ...task,
+
+          ...updatedData,
+
+          date: newDate,
+
+          status: newStatus,
+
+          completed:
+            updatedData.completed ??
+            task.completed,
+
+          completedAt:
+            updatedData.completedAt ??
+            task.completedAt,
+
+          updatedAt:
+            getTimestamp(),
+        };
+
+      })
+
+    );
+  };
+
+
+  /* =======================================================
+     COMPLETE TASK
+  ======================================================= */
+
+  const completeTask = (id) => {
+  const completedTime = getTimestamp();
+
+  setTasks((previousTasks) =>
+    previousTasks.map((task) => {
+      if (task.id !== id) {
+        return task;
+      }
+
+      return {
+        ...task,
+        completed: true,
+        status: "completed",
+        completedAt: completedTime,
+        updatedAt: completedTime,
+      };
+    })
+  );
+};
+
+  /* =======================================================
+     DELETE TASK
+  ======================================================= */
+
+  const deleteTask = (id) => {
+
+    setTasks((previousTasks) =>
+
+      previousTasks.filter(
+        (task) => task.id !== id
+      )
+
+    );
+  };
+
+
+  /* =======================================================
+     REFRESH DUE STATUS
+  ======================================================= */
+
+  const refreshTaskStatuses = () => {
+
+    setTasks((previousTasks) =>
+
+      previousTasks.map((task) => {
+
+        /*
+          Completed tasks should NEVER
+          become due again.
+        */
+
+        if (task.completed) {
+
+          return {
+            ...task,
+            status: "completed",
+          };
+
+        }
+
+
+        /*
+          Past unfinished task
+          becomes due.
+        */
+
+        if (isPastDate(task.date)) {
+
           return {
             ...task,
             status: "due",
           };
+
         }
 
-        return task;
-      })
-    );
 
-  }, []);
-
-
-  // ===============================
-  // ADD TASK
-  // ===============================
-
-  const addTask = (newTask) => {
-
-    setTasks((currentTasks) => [
-      ...currentTasks,
-
-      {
-        ...newTask,
-        id: Date.now(),
-        completed: false,
-        status: "pending",
-      },
-    ]);
-
-  };
-
-
-  // ===============================
-  // COMPLETE / UNCOMPLETE
-  // ===============================
-
-  const toggleTask = (id) => {
-
-    setTasks((currentTasks) =>
-      currentTasks.map((task) => {
-
-        if (task.id !== id) {
-          return task;
-        }
-
-        const completed = !task.completed;
+        /*
+          Future/today unfinished task
+          remains pending.
+        */
 
         return {
           ...task,
-          completed,
-          status: completed
-            ? "completed"
-            : "pending",
+          status: "pending",
         };
 
       })
-    );
 
+    );
   };
 
 
-  // ===============================
-  // DELETE TASK
-  // ===============================
+  /* =======================================================
+     ACTIVE TASKS
+  ======================================================= */
 
-  const deleteTask = (id) => {
+  const activeTasks = tasks.filter(
+    (task) => !task.completed
+  );
 
-    setTasks((currentTasks) =>
-      currentTasks.filter(
-        (task) => task.id !== id
-      )
+
+  /* =======================================================
+     COMPLETED TASKS
+  ======================================================= */
+
+  const completedTasks =
+    tasks.filter(
+      (task) => task.completed
     );
 
-  };
 
+  /* =======================================================
+     TODAY TASKS
+  ======================================================= */
 
-  // ===============================
-  // UPDATE TASK
-  // ===============================
-
-  const updateTask = (id, updatedData) => {
-
-    setTasks((currentTasks) =>
-      currentTasks.map((task) => {
-
-        if (task.id !== id) {
-          return task;
-        }
-
-        return {
-          ...task,
-          ...updatedData,
-        };
-
-      })
+  const todayTasks =
+    activeTasks.filter(
+      (task) =>
+        task.date === getToday() &&
+        task.status !== "due"
     );
 
+
+  /* =======================================================
+     DUE TASKS
+  ======================================================= */
+
+  const dueTasks =
+    activeTasks.filter(
+      (task) =>
+        task.status === "due"
+    );
+
+
+  /* =======================================================
+     COUNTS
+  ======================================================= */
+
+  const completedCount =
+    completedTasks.length;
+
+  const dueCount =
+    dueTasks.length;
+
+  const pendingCount =
+    activeTasks.filter(
+      (task) =>
+        task.status === "pending"
+    ).length;
+
+
+  /* =======================================================
+     CONTEXT VALUE
+  ======================================================= */
+
+  const value = {
+
+    tasks,
+
+    activeTasks,
+
+    completedTasks,
+
+    todayTasks,
+
+    dueTasks,
+
+    completedCount,
+
+    dueCount,
+
+    pendingCount,
+
+    addTask,
+
+    updateTask,
+
+    completeTask,
+
+    deleteTask,
+
+    refreshTaskStatuses,
   };
-
-
-  // ===============================
-  // COUNTS
-  // ===============================
-
-  const completedCount = tasks.filter(
-    (task) => task.completed
-  ).length;
-
-
-  const dueCount = tasks.filter(
-    (task) =>
-      task.status === "due" &&
-      !task.completed
-  ).length;
 
 
   return (
-
     <TaskContext.Provider
-      value={{
-        tasks,
-        addTask,
-        toggleTask,
-        deleteTask,
-        updateTask,
-        completedCount,
-        dueCount,
-      }}
+      value={value}
     >
-
       {children}
-
     </TaskContext.Provider>
-
   );
 }
 
 
+/* =========================================================
+   USE TASKS
+========================================================= */
+
 export function useTasks() {
-  return useContext(TaskContext);
+
+  const context =
+    useContext(TaskContext);
+
+  if (!context) {
+
+    throw new Error(
+      "useTasks must be used inside TaskProvider"
+    );
+
+  }
+
+  return context;
 }
+
+
+export default TaskContext;

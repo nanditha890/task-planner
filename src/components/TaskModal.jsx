@@ -1,15 +1,6 @@
 import { X } from "lucide-react";
 import { useState } from "react";
-
-function getToday() {
-  const today = new Date();
-
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
+import { getToday } from "../context/TaskContext";
 
 function TaskModal({
   onClose,
@@ -17,6 +8,16 @@ function TaskModal({
   onUpdateTask,
   editingTask,
 }) {
+  /* =====================================================
+     EDIT MODE
+  ===================================================== */
+
+  const isEditMode = Boolean(editingTask);
+
+  /* =====================================================
+     FORM STATE
+  ===================================================== */
+
   const [title, setTitle] = useState(
     editingTask?.title || ""
   );
@@ -25,6 +26,11 @@ function TaskModal({
     editingTask?.description || ""
   );
 
+  /*
+    IMPORTANT:
+    If editing an old task, keep its original date.
+    If adding a new task, use today's date.
+  */
   const [date, setDate] = useState(
     editingTask?.date || getToday()
   );
@@ -40,12 +46,16 @@ function TaskModal({
   );
 
   const [reminder, setReminder] = useState(
-    editingTask?.reminder || "15"
+    String(editingTask?.reminder ?? "15")
   );
 
   const [repeat, setRepeat] = useState(
     editingTask?.repeat || "Never"
   );
+
+  /* =====================================================
+     SUBMIT
+  ===================================================== */
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -56,51 +66,70 @@ function TaskModal({
 
     const taskData = {
       title: title.trim(),
+
       description: description.trim(),
-      date,
+
+      /*
+        Keep exactly the date selected by the user.
+      */
+      date: date,
+
       time: time || "No time set",
-      priority,
-      reminder,
-      repeat,
+
+      priority: priority,
+
+      reminder: Number(reminder),
+
+      repeat: repeat,
     };
 
-    // EDIT MODE
+    /* ===================================================
+       EDIT EXISTING TASK
+    =================================================== */
+
     if (editingTask) {
-      onUpdateTask(editingTask.id, taskData);
-      onClose();
+      onUpdateTask(
+        editingTask.id,
+        taskData
+      );
+
       return;
     }
 
-    // ADD MODE
+    /* ===================================================
+       ADD NEW TASK
+    =================================================== */
+
     onAddTask({
       ...taskData,
+
       status: "pending",
+
       completed: false,
     });
-
-    setTitle("");
-    setDescription("");
-    setDate(getToday());
-    setTime("");
-    setPriority("Medium");
-    setReminder("15");
-    setRepeat("Never");
   };
 
-  const isEditMode = Boolean(editingTask);
+  /* =====================================================
+     UI
+  ===================================================== */
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
 
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
 
-        {/* HEADER */}
+        {/* =================================================
+            HEADER
+        ================================================= */}
+
         <div className="mb-6 flex items-center justify-between">
 
           <div>
 
             <h2 className="text-xl font-bold text-gray-900">
-              {isEditMode ? "Edit Work" : "Add New Work"}
+              {isEditMode
+                ? "Edit Work"
+                : "Add New Work"}
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
@@ -112,6 +141,7 @@ function TaskModal({
           </div>
 
           <button
+            type="button"
             onClick={onClose}
             className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
           >
@@ -120,12 +150,19 @@ function TaskModal({
 
         </div>
 
+        {/* =================================================
+            FORM
+        ================================================= */}
+
         <form
           onSubmit={handleSubmit}
           className="space-y-5"
         >
 
-          {/* TITLE */}
+          {/* =================================================
+              TITLE
+          ================================================= */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -145,7 +182,10 @@ function TaskModal({
 
           </div>
 
-          {/* DESCRIPTION */}
+          {/* =================================================
+              DESCRIPTION
+          ================================================= */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -164,8 +204,13 @@ function TaskModal({
 
           </div>
 
-          {/* DATE + TIME */}
+          {/* =================================================
+              DATE + TIME
+          ================================================= */}
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+            {/* DATE */}
 
             <div>
 
@@ -184,6 +229,8 @@ function TaskModal({
               />
 
             </div>
+
+            {/* TIME */}
 
             <div>
 
@@ -204,7 +251,10 @@ function TaskModal({
 
           </div>
 
-          {/* PRIORITY */}
+          {/* =================================================
+              PRIORITY
+          ================================================= */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -235,7 +285,10 @@ function TaskModal({
 
           </div>
 
-          {/* REMINDER */}
+          {/* =================================================
+              REMINDER
+          ================================================= */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -278,7 +331,10 @@ function TaskModal({
 
           </div>
 
-          {/* REPEAT */}
+          {/* =================================================
+              REPEAT
+          ================================================= */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -313,7 +369,10 @@ function TaskModal({
 
           </div>
 
-          {/* BUTTONS */}
+          {/* =================================================
+              BUTTONS
+          ================================================= */}
+
           <div className="flex gap-3 pt-2">
 
             <button
