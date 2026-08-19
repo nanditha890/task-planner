@@ -54,6 +54,10 @@ function Sidebar() {
     },
   ];
 
+  /* =================================================
+     LOGOUT
+  ================================================= */
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -69,23 +73,23 @@ function Sidebar() {
     }
   };
 
-  /*
-    Get the user's display name.
-
-    Priority:
-    1. full_name from signup metadata
-    2. email
-    3. Guest
-  */
+  /* =================================================
+     USER DISPLAY NAME
+     
+     Priority:
+     1. Display Name from Supabase Auth metadata
+     2. Email as fallback
+     3. Guest
+  ================================================= */
 
   const userName =
     user?.user_metadata?.full_name ||
     user?.email ||
     "Guest";
 
-  /*
-    Get first letter for avatar.
-  */
+  /* =================================================
+     AVATAR LETTER
+  ================================================= */
 
   const avatarLetter =
     userName.charAt(0).toUpperCase();
@@ -106,6 +110,7 @@ function Sidebar() {
           Plan. Do. Complete.
         </p>
       </div>
+
 
       {/* =================================================
           NAVIGATION
@@ -129,11 +134,14 @@ function Sidebar() {
             >
               <Icon size={20} />
 
-              <span>{item.name}</span>
+              <span>
+                {item.name}
+              </span>
             </NavLink>
           );
         })}
       </nav>
+
 
       {/* =================================================
           LOGOUT
@@ -146,16 +154,24 @@ function Sidebar() {
       >
         <LogOut size={20} />
 
-        <span>Logout</span>
+        <span>
+          Logout
+        </span>
       </button>
+
 
       {/* =================================================
           USER PROFILE
+          
+          Clicking this opens Settings
       ================================================= */}
 
-      <div
-        className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-3"
+      <button
+        type="button"
+        onClick={() => navigate("/settings")}
+        className="flex w-full items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-3 text-left transition hover:border-blue-200 hover:bg-blue-50"
       >
+
         {/* AVATAR */}
 
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
@@ -168,9 +184,11 @@ function Sidebar() {
           )}
         </div>
 
-        {/* USER INFO */}
+
+        {/* USER INFORMATION */}
 
         <div className="min-w-0">
+
           <p className="truncate text-sm font-semibold text-gray-900">
             {userName}
           </p>
@@ -178,8 +196,11 @@ function Sidebar() {
           <p className="truncate text-xs text-gray-500">
             My Profile
           </p>
+
         </div>
-      </div>
+
+      </button>
+
     </aside>
   );
 }

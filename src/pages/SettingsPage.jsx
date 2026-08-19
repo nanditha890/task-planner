@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Bell,
@@ -7,7 +7,12 @@ import {
   Save,
 } from "lucide-react";
 
+import { supabase } from "../lib/supabase";
+import { useAuth } from "../context/AuthContext";
+
 function SettingsPage() {
+  const { user } = useAuth();
+
   // =====================================================
   // PROFILE
   // =====================================================
@@ -20,7 +25,6 @@ function SettingsPage() {
   // =====================================================
 
   const [notifications, setNotifications] = useState(true);
-
   const [emailNotifications, setEmailNotifications] =
     useState(false);
 
@@ -31,37 +35,210 @@ function SettingsPage() {
   const [darkMode, setDarkMode] = useState(false);
 
   // =====================================================
-  // SAVE STATE
+  // STATES
   // =====================================================
 
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+
+  // =====================================================
+  // LOAD USER PROFILE
+  // =====================================================
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // -----------------------------------------------
+        // GET PROFILE FROM SUPABASE
+        // -----------------------------------------------
+
+        const { data: profile, error: profileError } =
+          await supabase
+            .from("profiles")
+            .select("id, full_name")
+            .eq("id", user.id)
+            .single();
+
+        if (profileError) {
+          console.error(
+            "Error loading profile:",
+            profileError
+          );
+
+          // Fallback to Auth metadata
+          setName(
+            user.user_metadata?.full_name || ""
+          );
+
+          setEmail(user.email || "");
+
+        } else {
+          setName(profile?.full_name || "");
+          setEmail(user.email || "");
+        }
+
+        // -----------------------------------------------
+        // LOAD LOCAL SETTINGS
+        // -----------------------------------------------
+
+        const savedSettings =
+          localStorage.getItem("taskflow_settings");
+
+        if (savedSettings) {
+          const settings =
+            JSON.parse(savedSettings);
+
+          setNotifications(
+            settings.notifications ?? true
+          );
+
+          setEmailNotifications(
+            settings.emailNotifications ?? false
+          );
+
+          setDarkMode(
+            settings.darkMode ?? false
+          );
+        }
+
+      } catch (error) {
+        console.error(
+          "Error loading settings:",
+          error
+        );
+
+        setError(
+          "Unable to load profile."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, [user]);
+
+  // =====================================================
+  // APPLY DARK MODE
+  // =====================================================
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add(
+        "dark"
+      );
+    } else {
+      document.documentElement.classList.remove(
+        "dark"
+      );
+    }
+  }, [darkMode]);
 
   // =====================================================
   // SAVE SETTINGS
   // =====================================================
 
-  const handleSave = () => {
-    const settings = {
-      name,
-      email,
-      notifications,
-      emailNotifications,
-      darkMode,
-    };
+  const handleSave = async () => {
+    if (!user) {
+      setError("User is not logged in.");
+      return;
+    }
 
-    // Temporary local storage.
-    // Later Supabase will store this permanently.
-    localStorage.setItem(
-      "taskflow_settings",
-      JSON.stringify(settings)
-    );
+    setSaving(true);
+    setError("");
+    setSaved(false);
 
-    setSaved(true);
+    try {
+      // -----------------------------------------------
+      // UPDATE PROFILE
+      // -----------------------------------------------
 
-    setTimeout(() => {
-      setSaved(false);
-    }, 2000);
+      const { error: profileError } =
+        await supabase
+          .from("profiles")
+          .update({
+            full_name: name.trim(),
+          })
+          .eq("id", user.id);
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      // -----------------------------------------------
+      // UPDATE AUTH METADATA
+      // -----------------------------------------------
+
+      const { error: authError } =
+        await supabase.auth.updateUser({
+          data: {
+            full_name: name.trim(),
+          },
+        });
+
+      if (authError) {
+        console.error(
+          "Auth metadata update failed:",
+          authError
+        );
+      }
+
+      // -----------------------------------------------
+      // SAVE APP SETTINGS
+      // -----------------------------------------------
+
+      const settings = {
+        notifications,
+        emailNotifications,
+        darkMode,
+      };
+
+      localStorage.setItem(
+        "taskflow_settings",
+        JSON.stringify(settings)
+      );
+
+      setSaved(true);
+
+      setTimeout(() => {
+        setSaved(false);
+      }, 2000);
+
+    } catch (error) {
+      console.error(
+        "Error saving settings:",
+        error
+      );
+
+      setError(
+        error.message ||
+          "Unable to save settings."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
+
+  // =====================================================
+  // LOADING
+  // =====================================================
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[300px] items-center justify-center">
+        <p className="text-gray-500">
+          Loading settings...
+        </p>
+      </div>
+    );
+  }
 
   // =====================================================
   // UI
@@ -70,26 +247,31 @@ function SettingsPage() {
   return (
     <div className="max-w-4xl space-y-8">
 
-      {/* =================================================
-          HEADER
-      ================================================= */}
+      {/* HEADER */}
 
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Settings
         </h1>
 
-        <p className="mt-1 text-gray-500">
+        <p className="mt-1 text-gray-500 dark:text-gray-400">
           Manage your TaskFlow preferences.
         </p>
       </div>
 
+      {/* ERROR */}
+
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+          {error}
+        </div>
+      )}
 
       {/* =================================================
           PROFILE
       ================================================= */}
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
 
         <div className="flex items-center gap-3">
 
@@ -98,31 +280,27 @@ function SettingsPage() {
           </div>
 
           <div>
-
-            <h2 className="font-semibold text-gray-900">
+            <h2 className="font-semibold text-gray-900 dark:text-white">
               Profile
             </h2>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Manage your basic information.
             </p>
-
           </div>
 
         </div>
-
 
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
 
           {/* NAME */}
 
           <div>
-
             <label
               htmlFor="name"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              Name
+              Display Name
             </label>
 
             <input
@@ -133,32 +311,16 @@ function SettingsPage() {
                 setName(event.target.value)
               }
               placeholder="Your name"
-              className="
-                mt-2
-                w-full
-                rounded-xl
-                border
-                border-gray-200
-                px-4
-                py-3
-                outline-none
-                transition
-                focus:border-blue-500
-                focus:ring-2
-                focus:ring-blue-100
-              "
+              className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             />
-
           </div>
-
 
           {/* EMAIL */}
 
           <div>
-
             <label
               htmlFor="email"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               Email
             </label>
@@ -167,38 +329,24 @@ function SettingsPage() {
               id="email"
               type="email"
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
-              placeholder="your@email.com"
-              className="
-                mt-2
-                w-full
-                rounded-xl
-                border
-                border-gray-200
-                px-4
-                py-3
-                outline-none
-                transition
-                focus:border-blue-500
-                focus:ring-2
-                focus:ring-blue-100
-              "
+              disabled
+              className="mt-2 w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-100 px-4 py-3 text-gray-500 outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400"
             />
 
+            <p className="mt-1 text-xs text-gray-400">
+              Email is managed by your account.
+            </p>
           </div>
 
         </div>
 
       </div>
 
-
       {/* =================================================
           NOTIFICATIONS
       ================================================= */}
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
 
         <div className="flex items-center gap-3">
 
@@ -207,19 +355,16 @@ function SettingsPage() {
           </div>
 
           <div>
-
-            <h2 className="font-semibold text-gray-900">
+            <h2 className="font-semibold text-gray-900 dark:text-white">
               Notifications
             </h2>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Control how you receive reminders.
             </p>
-
           </div>
 
         </div>
-
 
         <div className="mt-6 space-y-6">
 
@@ -228,15 +373,13 @@ function SettingsPage() {
           <div className="flex items-center justify-between gap-4">
 
             <div>
-
-              <p className="font-medium text-gray-800">
+              <p className="font-medium text-gray-800 dark:text-gray-200">
                 Task reminders
               </p>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Receive reminders for upcoming tasks.
               </p>
-
             </div>
 
             <button
@@ -244,14 +387,12 @@ function SettingsPage() {
               onClick={() =>
                 setNotifications(!notifications)
               }
-              aria-label="Toggle task reminders"
               className={`relative h-6 w-11 shrink-0 rounded-full transition ${
                 notifications
                   ? "bg-blue-600"
                   : "bg-gray-300"
               }`}
             >
-
               <span
                 className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${
                   notifications
@@ -259,26 +400,22 @@ function SettingsPage() {
                     : "left-1"
                 }`}
               />
-
             </button>
 
           </div>
-
 
           {/* EMAIL NOTIFICATIONS */}
 
           <div className="flex items-center justify-between gap-4">
 
             <div>
-
-              <p className="font-medium text-gray-800">
+              <p className="font-medium text-gray-800 dark:text-gray-200">
                 Email notifications
               </p>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Receive task reminders by email.
               </p>
-
             </div>
 
             <button
@@ -288,14 +425,12 @@ function SettingsPage() {
                   !emailNotifications
                 )
               }
-              aria-label="Toggle email notifications"
               className={`relative h-6 w-11 shrink-0 rounded-full transition ${
                 emailNotifications
                   ? "bg-blue-600"
                   : "bg-gray-300"
               }`}
             >
-
               <span
                 className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${
                   emailNotifications
@@ -303,21 +438,18 @@ function SettingsPage() {
                     : "left-1"
                 }`}
               />
-
             </button>
 
           </div>
 
         </div>
-
       </div>
-
 
       {/* =================================================
           APPEARANCE
       ================================================= */}
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
 
         <div className="flex items-center gap-3">
 
@@ -326,48 +458,40 @@ function SettingsPage() {
           </div>
 
           <div>
-
-            <h2 className="font-semibold text-gray-900">
+            <h2 className="font-semibold text-gray-900 dark:text-white">
               Appearance
             </h2>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Customize how the application looks.
             </p>
-
           </div>
 
         </div>
 
-
-        <div className="mt-6 flex items-center justify-between gap-4">
+        <div className="mt-6 flex items-center justify-between">
 
           <div>
-
-            <p className="font-medium text-gray-800">
+            <p className="font-medium text-gray-800 dark:text-gray-200">
               Dark mode
             </p>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Use a darker color scheme.
             </p>
-
           </div>
-
 
           <button
             type="button"
             onClick={() =>
               setDarkMode(!darkMode)
             }
-            aria-label="Toggle dark mode"
             className={`relative h-6 w-11 shrink-0 rounded-full transition ${
               darkMode
                 ? "bg-blue-600"
                 : "bg-gray-300"
             }`}
           >
-
             <span
               className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${
                 darkMode
@@ -375,13 +499,11 @@ function SettingsPage() {
                   : "left-1"
               }`}
             />
-
           </button>
 
         </div>
 
       </div>
-
 
       {/* =================================================
           SAVE
@@ -398,26 +520,14 @@ function SettingsPage() {
         <button
           type="button"
           onClick={handleSave}
-          className="
-            flex
-            items-center
-            gap-2
-            rounded-xl
-            bg-blue-600
-            px-5
-            py-3
-            font-medium
-            text-white
-            shadow-sm
-            transition
-            hover:bg-blue-700
-          "
+          disabled={saving}
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-
           <Save size={18} />
 
-          Save Settings
-
+          {saving
+            ? "Saving..."
+            : "Save Settings"}
         </button>
 
       </div>
