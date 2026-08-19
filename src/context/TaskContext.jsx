@@ -1,633 +1,3 @@
-// import {
-//   createContext,
-//   useContext,
-//   useState,
-//   useEffect,
-// } from "react";
-
-// import { supabase } from "../lib/supabase";
-
-// const TaskContext = createContext(null);
-
-// /* =========================================================
-//    GET TODAY
-// ========================================================= */
-
-// export function getToday() {
-//   const today = new Date();
-
-//   const year = today.getFullYear();
-
-//   const month = String(
-//     today.getMonth() + 1
-//   ).padStart(2, "0");
-
-//   const day = String(
-//     today.getDate()
-//   ).padStart(2, "0");
-
-//   return `${year}-${month}-${day}`;
-// }
-
-
-// /* =========================================================
-//    TIMESTAMP
-// ========================================================= */
-
-// function getTimestamp() {
-//   return new Date().toISOString();
-// }
-
-
-// /* =========================================================
-//    CHECK WHETHER DATE IS IN THE PAST
-// ========================================================= */
-
-// function isPastDate(date) {
-//   if (!date) {
-//     return false;
-//   }
-
-//   return date < getToday();
-// }
-
-
-// /* =========================================================
-//    GET INITIAL STATUS
-// ========================================================= */
-
-// function getTaskStatus(date) {
-//   if (isPastDate(date)) {
-//     return "due";
-//   }
-
-//   return "pending";
-// }
-
-
-// /* =========================================================
-//    TASK PROVIDER
-// ========================================================= */
-
-// export function TaskProvider({ children }) {
-
-//   const [currentUser, setCurrentUser] = useState(null);
-
-//   const [tasks, setTasks] = useState([
-
-//     /* =====================================================
-//        SAMPLE TASK 1
-//     ===================================================== */
-
-//     {
-//       id: 1,
-
-//       title: "Complete project report",
-
-//       description:
-//         "Finish the project documentation.",
-
-//       date: getToday(),
-
-//       time: "10:00",
-
-//       priority: "High",
-
-//       reminder: 15,
-
-//       repeat: "Never",
-
-//       status: "pending",
-
-//       completed: false,
-
-//       completedAt: null,
-
-//       createdAt: getTimestamp(),
-
-//       updatedAt: getTimestamp(),
-//     },
-
-
-//     /* =====================================================
-//        SAMPLE TASK 2
-//     ===================================================== */
-
-//     {
-//       id: 2,
-
-//       title: "Review yesterday's work",
-
-//       description:
-//         "Check the pending work from yesterday.",
-
-//       date: getToday(),
-
-//       time: "14:00",
-
-//       priority: "Medium",
-
-//       reminder: 15,
-
-//       repeat: "Never",
-
-//       status: "pending",
-
-//       completed: false,
-
-//       completedAt: null,
-
-//       createdAt: getTimestamp(),
-
-//       updatedAt: getTimestamp(),
-//     },
-
-//   ]);
-
-//   /* =======================================================
-//      LOAD CURRENT USER
-//   ======================================================= */
-
-//   const loadCurrentUser = async () => {
-
-//     const {
-//       data: { user },
-//       error,
-//     } = await supabase.auth.getUser();
-
-//     if (error) {
-
-//       console.error(
-//         "Error getting current user:",
-//         error
-//       );
-
-//       return;
-//     }
-
-//     setCurrentUser(user);
-//   };
-
-
-//   useEffect(() => {
-
-//     loadCurrentUser();
-
-//   }, []);
-
-//     /* =======================================================
-//      GET CURRENT USER PROFILE
-//   ======================================================= */
-
-//   const getCurrentUserProfile = async () => {
-
-//     const {
-//       data: { user },
-//       error: userError,
-//     } = await supabase.auth.getUser();
-
-//     if (userError || !user) {
-
-//       console.error(
-//         "User not found:",
-//         userError
-//       );
-
-//       return null;
-//     }
-
-//     const {
-//       data: profile,
-//       error: profileError,
-//     } = await supabase
-//       .from("profiles")
-//       .select("id, full_name")
-//       .eq("id", user.id)
-//       .single();
-
-//     if (profileError) {
-
-//       console.error(
-//         "Profile not found:",
-//         profileError
-//       );
-
-//       return {
-//         id: user.id,
-
-//         full_name:
-//           user.user_metadata?.full_name ||
-//           user.email ||
-//           "Unknown User",
-//       };
-//     }
-
-//     return profile;
-//   };
-//   /* =======================================================
-//      ADD TASK
-//   ======================================================= */
-// const addTask = async (taskData) => {
-
-//   const profile = await getCurrentUserProfile();
-
-//   if (!profile) {
-//     console.error("Cannot create task: user profile not found");
-//     return;
-//   }
-
-//   const taskDate =
-//     taskData.date || getToday();
-
-//   const newTask = {
-
-//     title:
-//       taskData.title?.trim() || "",
-
-//     description:
-//       taskData.description?.trim() || "",
-
-//     date: taskDate,
-
-//     time:
-//       taskData.time || null,
-
-//     priority:
-//       taskData.priority || "Medium",
-
-//     reminder:
-//       Number(taskData.reminder || 0),
-
-//     repeat:
-//       taskData.repeat || "Never",
-
-//     status:
-//       getTaskStatus(taskDate),
-
-//     completed: false,
-
-//     created_by_id:
-//       profile.id,
-
-//     created_by_name:
-//       profile.full_name,
-
-//     completed_by_id: null,
-
-//     completed_by_name: null,
-
-//     completed_at: null,
-//   };
-
-
-//   const {
-//     data,
-//     error,
-//   } = await supabase
-//     .from("tasks")
-//     .insert([newTask])
-//     .select()
-//     .single();
-
-
-//   if (error) {
-
-//     console.error(
-//       "Error creating task:",
-//       error
-//     );
-
-//     return;
-//   }
-
-
-//   const taskForApp = {
-
-//     ...data,
-
-//     completedAt:
-//       data.completed_at,
-
-//     createdAt:
-//       data.created_at,
-
-//     updatedAt:
-//       data.updated_at,
-
-//     createdById:
-//       data.created_by_id,
-
-//     createdByName:
-//       data.created_by_name,
-
-//     completedById:
-//       data.completed_by_id,
-
-//     completedByName:
-//       data.completed_by_name,
-//   };
-
-
-//   setTasks((previousTasks) => [
-//     ...previousTasks,
-//     taskForApp,
-//   ]);
-// };
-
-
-//   /* =======================================================
-//      UPDATE TASK
-//   ======================================================= */
-
-//   const updateTask = (
-//     id,
-//     updatedData
-//   ) => {
-
-//     setTasks((previousTasks) =>
-
-//       previousTasks.map((task) => {
-
-//         if (task.id !== id) {
-//           return task;
-//         }
-
-//         const newDate =
-//           updatedData.date ?? task.date;
-
-//         let newStatus = task.status;
-
-//         /*
-//           If task is already completed,
-//           keep it completed.
-//         */
-
-//         if (task.completed) {
-
-//           newStatus = "completed";
-
-//         } else {
-
-//           newStatus =
-//             getTaskStatus(newDate);
-
-//         }
-
-//         return {
-
-//           ...task,
-
-//           ...updatedData,
-
-//           date: newDate,
-
-//           status: newStatus,
-
-//           completed:
-//             updatedData.completed ??
-//             task.completed,
-
-//           completedAt:
-//             updatedData.completedAt ??
-//             task.completedAt,
-
-//           updatedAt:
-//             getTimestamp(),
-//         };
-
-//       })
-
-//     );
-//   };
-
-
-//   /* =======================================================
-//      COMPLETE TASK
-//   ======================================================= */
-
-//   const completeTask = (id) => {
-//   const completedTime = getTimestamp();
-
-//   setTasks((previousTasks) =>
-//     previousTasks.map((task) => {
-//       if (task.id !== id) {
-//         return task;
-//       }
-
-//       return {
-//         ...task,
-//         completed: true,
-//         status: "completed",
-//         completedAt: completedTime,
-//         updatedAt: completedTime,
-//       };
-//     })
-//   );
-// };
-
-//   /* =======================================================
-//      DELETE TASK
-//   ======================================================= */
-
-//   const deleteTask = (id) => {
-
-//     setTasks((previousTasks) =>
-
-//       previousTasks.filter(
-//         (task) => task.id !== id
-//       )
-
-//     );
-//   };
-
-
-//   /* =======================================================
-//      REFRESH DUE STATUS
-//   ======================================================= */
-
-//   const refreshTaskStatuses = () => {
-
-//     setTasks((previousTasks) =>
-
-//       previousTasks.map((task) => {
-
-//         /*
-//           Completed tasks should NEVER
-//           become due again.
-//         */
-
-//         if (task.completed) {
-
-//           return {
-//             ...task,
-//             status: "completed",
-//           };
-
-//         }
-
-
-//         /*
-//           Past unfinished task
-//           becomes due.
-//         */
-
-//         if (isPastDate(task.date)) {
-
-//           return {
-//             ...task,
-//             status: "due",
-//           };
-
-//         }
-
-
-//         /*
-//           Future/today unfinished task
-//           remains pending.
-//         */
-
-//         return {
-//           ...task,
-//           status: "pending",
-//         };
-
-//       })
-
-//     );
-//   };
-
-
-//   /* =======================================================
-//      ACTIVE TASKS
-//   ======================================================= */
-
-//   const activeTasks = tasks.filter(
-//     (task) => !task.completed
-//   );
-
-
-//   /* =======================================================
-//      COMPLETED TASKS
-//   ======================================================= */
-
-//   const completedTasks =
-//     tasks.filter(
-//       (task) => task.completed
-//     );
-
-
-//   /* =======================================================
-//      TODAY TASKS
-//   ======================================================= */
-
-//   const todayTasks =
-//     activeTasks.filter(
-//       (task) =>
-//         task.date === getToday() &&
-//         task.status !== "due"
-//     );
-
-
-//   /* =======================================================
-//      DUE TASKS
-//   ======================================================= */
-
-//   const dueTasks =
-//     activeTasks.filter(
-//       (task) =>
-//         task.status === "due"
-//     );
-
-
-//   /* =======================================================
-//      COUNTS
-//   ======================================================= */
-
-//   const completedCount =
-//     completedTasks.length;
-
-//   const dueCount =
-//     dueTasks.length;
-
-//   const pendingCount =
-//     activeTasks.filter(
-//       (task) =>
-//         task.status === "pending"
-//     ).length;
-
-
-//   /* =======================================================
-//      CONTEXT VALUE
-//   ======================================================= */
-
-//   const value = {
-
-//   tasks,
-
-//   activeTasks,
-
-//   completedTasks,
-
-//   todayTasks,
-
-//   dueTasks,
-
-//   completedCount,
-
-//   dueCount,
-
-//   pendingCount,
-
-//   currentUser,
-
-//   getCurrentUserProfile,
-
-//   addTask,
-
-//   updateTask,
-
-//   completeTask,
-
-//   deleteTask,
-
-//   refreshTaskStatuses,
-// };
-
-
-//   return (
-//     <TaskContext.Provider
-//       value={value}
-//     >
-//       {children}
-//     </TaskContext.Provider>
-//   );
-// }
-
-// /* =========================================================
-//    USE TASKS
-// ========================================================= */
-
-// export function useTasks() {
-
-//   const context =
-//     useContext(TaskContext);
-
-//   if (!context) {
-
-//     throw new Error(
-//       "useTasks must be used inside TaskProvider"
-//     );
-
-//   }
-
-//   return context;
-// }
-
-
-// export default TaskContext;
-
-
-
 import {
   createContext,
   useContext,
@@ -702,6 +72,9 @@ function formatTask(task) {
     createdById: task.created_by_id,
     createdByName: task.created_by_name,
 
+    updatedById: task.updated_by_id,
+    updatedByName: task.updated_by_name,
+
     completedById: task.completed_by_id,
     completedByName: task.completed_by_name,
   };
@@ -749,47 +122,65 @@ export function TaskProvider({ children }) {
   ======================================================= */
 
   const getCurrentUserProfile = async () => {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-      console.error(
-        "User not found:",
-        userError
-      );
+  if (userError || !user) {
+    console.error(
+      "User not found:",
+      userError
+    );
 
-      return null;
-    }
+    return null;
+  }
 
-    const {
-      data: profile,
-      error: profileError,
-    } = await supabase
-      .from("profiles")
-      .select("id, full_name")
-      .eq("id", user.id)
-      .single();
+  const {
+    data: profile,
+    error: profileError,
+  } = await supabase
+    .from("profiles")
+    .select("id, full_name")
+    .eq("id", user.id)
+    .single();
 
-    if (profileError) {
-      console.error(
-        "Profile not found:",
-        profileError
-      );
+  /*
+    Priority:
 
-      return {
-        id: user.id,
+    1. profiles.full_name
+    2. Auth Display Name
+    3. Auth name
+    4. Unknown User
 
-        full_name:
-          user.user_metadata?.full_name ||
-          user.email ||
-          "Unknown User",
-      };
-    }
+    Email is NOT used as the display name.
+  */
 
-    return profile;
+  if (profileError || !profile) {
+    console.warn(
+      "Profile not found. Using Auth Display Name."
+    );
+
+    return {
+      id: user.id,
+
+      full_name:
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        "Unknown User",
+    };
+  }
+
+  return {
+    id: profile.id,
+
+    full_name:
+      profile.full_name ||
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      "Unknown User",
   };
+};
 
   /* =======================================================
      LOAD TASKS FROM SUPABASE
@@ -956,9 +347,13 @@ export function TaskProvider({ children }) {
 
       completed_by_id: null,
 
-      completed_by_name: null,
+completed_by_name: null,
 
-      completed_at: null,
+completed_at: null,
+
+updated_by_id: profile.id,
+
+updated_by_name: profile.full_name,
     };
 
     const {
@@ -994,155 +389,109 @@ export function TaskProvider({ children }) {
      UPDATE TASK
   ======================================================= */
 
-  const updateTask = async (
-    id,
-    updatedData
-  ) => {
-    const existingTask =
-      tasks.find(
-        (task) => task.id === id
-      );
+ const updateTask = async (id, updatedData) => {
+  const existingTask = tasks.find(
+    (task) => task.id === id
+  );
 
-    if (!existingTask) {
-      console.error(
-        "Task not found:",
-        id
-      );
+  if (!existingTask) {
+    console.error("Task not found:", id);
+    return null;
+  }
 
-      return;
-    }
+  const profile = await getCurrentUserProfile();
 
-    const newDate =
-      updatedData.date ??
-      existingTask.date;
-
-    let newStatus;
-
-    if (existingTask.completed) {
-      newStatus = "completed";
-    } else {
-      newStatus =
-        getTaskStatus(newDate);
-    }
-
-    const databaseUpdate = {
-      ...updatedData,
-
-      date: newDate,
-
-      status: newStatus,
-
-      updated_at:
-        getTimestamp(),
-    };
-
-    /*
-      Convert React camelCase fields
-      to Supabase snake_case fields.
-    */
-
-    if (
-      "completedAt" in
-      databaseUpdate
-    ) {
-      databaseUpdate.completed_at =
-        databaseUpdate.completedAt;
-
-      delete databaseUpdate.completedAt;
-    }
-
-    if (
-      "createdAt" in
-      databaseUpdate
-    ) {
-      databaseUpdate.created_at =
-        databaseUpdate.createdAt;
-
-      delete databaseUpdate.createdAt;
-    }
-
-    if (
-      "completedById" in
-      databaseUpdate
-    ) {
-      databaseUpdate.completed_by_id =
-        databaseUpdate.completedById;
-
-      delete databaseUpdate.completedById;
-    }
-
-    if (
-      "completedByName" in
-      databaseUpdate
-    ) {
-      databaseUpdate.completed_by_name =
-        databaseUpdate.completedByName;
-
-      delete databaseUpdate.completedByName;
-    }
-
-    if (
-      "createdById" in
-      databaseUpdate
-    ) {
-      databaseUpdate.created_by_id =
-        databaseUpdate.createdById;
-
-      delete databaseUpdate.createdById;
-    }
-
-    if (
-      "createdByName" in
-      databaseUpdate
-    ) {
-      databaseUpdate.created_by_name =
-        databaseUpdate.createdByName;
-
-      delete databaseUpdate.createdByName;
-    }
-
-    /*
-      Make sure completed stays consistent.
-    */
-
-    if (
-      updatedData.completed !==
-      undefined
-    ) {
-      databaseUpdate.completed =
-        updatedData.completed;
-    }
-
-    const {
-      data,
-      error,
-    } = await supabase
-      .from("tasks")
-      .update(databaseUpdate)
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error(
-        "Error updating task:",
-        error
-      );
-
-      return;
-    }
-
-    const updatedTask =
-      formatTask(data);
-
-    setTasks((previousTasks) =>
-      previousTasks.map((task) =>
-        task.id === id
-          ? updatedTask
-          : task
-      )
+  if (!profile) {
+    console.error(
+      "Cannot update task: user profile not found"
     );
+    return null;
+  }
+
+  const newDate =
+    updatedData.date ?? existingTask.date;
+
+  let newStatus;
+
+  if (existingTask.completed) {
+    newStatus = "completed";
+  } else {
+    newStatus = getTaskStatus(newDate);
+  }
+
+  const updatedTime = getTimestamp();
+
+  const databaseUpdate = {
+    title:
+      updatedData.title ??
+      existingTask.title,
+
+    description:
+      updatedData.description ??
+      existingTask.description,
+
+    date: newDate,
+
+    time:
+      updatedData.time ??
+      existingTask.time,
+
+    priority:
+      updatedData.priority ??
+      existingTask.priority,
+
+    reminder:
+      updatedData.reminder ??
+      existingTask.reminder,
+
+    repeat:
+      updatedData.repeat ??
+      existingTask.repeat,
+
+    status: newStatus,
+
+    completed:
+      updatedData.completed ??
+      existingTask.completed,
+
+    updated_at: updatedTime,
+
+    updated_by_id: profile.id,
+
+    updated_by_name: profile.full_name,
   };
+
+  const {
+    data,
+    error,
+  } = await supabase
+    .from("tasks")
+    .update(databaseUpdate)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(
+      "Error updating task:",
+      error
+    );
+
+    return null;
+  }
+
+  const updatedTask = formatTask(data);
+
+  setTasks((previousTasks) =>
+    previousTasks.map((task) =>
+      task.id === id
+        ? updatedTask
+        : task
+    )
+  );
+
+  return updatedTask;
+};
 
   /* =======================================================
      COMPLETE TASK
@@ -1169,22 +518,22 @@ export function TaskProvider({ children }) {
     } = await supabase
       .from("tasks")
       .update({
-        completed: true,
+  completed: true,
 
-        status: "completed",
+  status: "completed",
 
-        completed_at:
-          completedTime,
+  completed_at: completedTime,
 
-        completed_by_id:
-          profile.id,
+  completed_by_id: profile.id,
 
-        completed_by_name:
-          profile.full_name,
+  completed_by_name: profile.full_name,
 
-        updated_at:
-          completedTime,
-      })
+  updated_at: completedTime,
+
+  updated_by_id: profile.id,
+
+  updated_by_name: profile.full_name,
+})
       .eq("id", id)
       .select()
       .single();

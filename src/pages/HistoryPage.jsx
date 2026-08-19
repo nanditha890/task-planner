@@ -2,6 +2,7 @@ import {
   CheckCircle2,
   CalendarDays,
   Clock3,
+  User,
 } from "lucide-react";
 
 import { useTasks } from "../context/TaskContext";
@@ -44,6 +45,17 @@ function HistoryPage() {
   };
 
   // =====================================================
+  // GET COMPLETED BY NAME
+  // =====================================================
+
+  const getCompletedByName = (task) => {
+    return (
+      task.completedByName ||
+      "Unknown User"
+    );
+  };
+
+  // =====================================================
   // UI
   // =====================================================
 
@@ -64,7 +76,6 @@ function HistoryPage() {
         </p>
       </div>
 
-
       {/* =================================================
           SUMMARY
       ================================================= */}
@@ -80,7 +91,6 @@ function HistoryPage() {
         </p>
 
       </div>
-
 
       {/* =================================================
           HISTORY LIST
@@ -137,7 +147,6 @@ function HistoryPage() {
 
                     </div>
 
-
                     {/* TASK INFORMATION */}
 
                     <div className="min-w-0">
@@ -145,7 +154,6 @@ function HistoryPage() {
                       <h3 className="font-semibold text-gray-900">
                         {task.title}
                       </h3>
-
 
                       {/* DESCRIPTION */}
 
@@ -156,7 +164,6 @@ function HistoryPage() {
                         </p>
 
                       )}
-
 
                       {/* ORIGINAL DATE + TIME */}
 
@@ -170,7 +177,6 @@ function HistoryPage() {
 
                         </span>
 
-
                         <span className="flex items-center gap-1">
 
                           <Clock3 size={14} />
@@ -181,10 +187,26 @@ function HistoryPage() {
 
                       </div>
 
+                      {/* =================================
+                          COMPLETED BY
+                      ================================= */}
+
+                      <div className="mt-3 flex items-center gap-1 text-xs text-gray-500">
+
+                        <User size={14} />
+
+                        <span>
+                          Completed by{" "}
+                          <span className="font-medium text-gray-700">
+                            {getCompletedByName(task)}
+                          </span>
+                        </span>
+
+                      </div>
+
                     </div>
 
                   </div>
-
 
                   {/* RIGHT */}
 
@@ -199,7 +221,9 @@ function HistoryPage() {
                     </p>
 
                     <p className="text-xs font-medium text-gray-500">
-                      {formatCompletedAt(task.completedAt)}
+                      {formatCompletedAt(
+                        task.completedAt
+                      )}
                     </p>
 
                   </div>
