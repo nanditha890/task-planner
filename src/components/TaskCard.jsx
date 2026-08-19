@@ -8,6 +8,7 @@ import {
 
 function TaskCard({
   task,
+  isCompleting = false,
   onComplete,
   onEdit,
   onDelete,
@@ -28,41 +29,43 @@ function TaskCard({
      COMPLETED STATE
   ======================================================= */
 
-  const isCompleted =
-    task.completed === true ||
-    task.status === "completed";
+ const isCompleted =
+  task.completed === true ||
+  task.status === "completed" ||
+  isCompleting;
 
   /* =======================================================
-     COMPLETE
+     COMPLETE TASK
   ======================================================= */
 
-  const handleComplete = () => {
-    if (isCompleted) {
-      return;
-    }
+ const handleComplete = () => {
+  if (isCompleted) {
+    return;
+  }
 
-    onComplete(task.id);
-  };
+  onComplete(task.id);
+};
 
   return (
     <div
       className={`
-        mb-3
-        rounded-2xl
-        border
-        p-5
-        shadow-sm
-        transition-all
-        duration-500
+  mb-3
+  rounded-2xl
+  border
+  p-5
+  shadow-sm
+  transition-all
+  duration-500
+  ease-in-out
 
-        ${
-          isCompleted
-            ? "border-green-300 bg-green-50"
-            : task.status === "due"
-            ? "border-orange-200 bg-white"
-            : "border-gray-200 bg-white"
-        }
-      `}
+  ${
+    isCompleted
+      ? "scale-[0.98] border-green-300 bg-green-50 opacity-80"
+      : task.status === "due"
+      ? "border-orange-200 bg-white"
+      : "border-gray-200 bg-white"
+  }
+`}
     >
       <div className="flex items-start justify-between gap-4">
 
@@ -179,6 +182,7 @@ function TaskCard({
               </span>
 
             </div>
+
           </div>
         </div>
 
@@ -193,17 +197,23 @@ function TaskCard({
           ================================================= */}
 
           {isCompleted ? (
+
             <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-600">
               COMPLETED
             </span>
+
           ) : task.status === "due" ? (
+
             <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600">
               DUE
             </span>
+
           ) : (
+
             <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
               PENDING
             </span>
+
           )}
 
           {/* =================================================
@@ -232,8 +242,6 @@ function TaskCard({
 
           {/* =================================================
               EDIT + DELETE
-              
-              Don't show these after completion.
           ================================================= */}
 
           {!isCompleted && (
@@ -277,6 +285,7 @@ function TaskCard({
 
             </div>
           )}
+
         </div>
       </div>
     </div>

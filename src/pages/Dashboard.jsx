@@ -21,14 +21,6 @@ function Dashboard() {
   const [editingTask, setEditingTask] = useState(null);
 
   /* =====================================================
-     COMPLETION ANIMATION
-
-     Keeps the completed task visible temporarily.
-  ===================================================== */
-
-  const [completingTaskIds, setCompletingTaskIds] = useState([]);
-
-  /* =====================================================
      CONTEXT
   ===================================================== */
 
@@ -38,8 +30,8 @@ function Dashboard() {
     completeTask,
     deleteTask,
     updateTask,
-    todayTasks: contextTodayTasks,
-    dueTasks: contextDueTasks,
+    todayTasks,
+    dueTasks,
     completedCount,
     dueCount,
   } = useTasks();
@@ -58,91 +50,37 @@ function Dashboard() {
     String(todayDate.getDate()).padStart(2, "0");
 
   /* =====================================================
-     TODAY'S WORK
-
-     Normally completed tasks are removed.
-
-     But while animation is running, keep them visible.
-  ===================================================== */
-
-  const todayTasks = tasks.filter((task) => {
-    // Must be today's task
-    if (task.date !== today) {
-      return false;
-    }
-
-    // Due tasks belong in Due Work
-    if (task.status === "due") {
-      return false;
-    }
-
-    // Completed task stays visible during animation
-    if (task.completed) {
-      return completingTaskIds.includes(task.id);
-    }
-
-    return true;
-  });
-
-  /* =====================================================
-     DUE WORK
-
-     Normally completed due tasks disappear.
-
-     But while animation is running, keep them visible.
-  ===================================================== */
-
-  const dueTasks = tasks.filter((task) => {
-    // Due task must be from previous day
-    if (task.date >= today) {
-      return false;
-    }
-
-    // Only unfinished OR currently animating
-    if (
-      task.completed &&
-      !completingTaskIds.includes(task.id)
-    ) {
-      return false;
-    }
-
-    // Make sure it is actually due
-    if (
-      task.status !== "due" &&
-      !completingTaskIds.includes(task.id)
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-
-  /* =====================================================
      COMPLETION HANDLER
   ===================================================== */
 
-  const handleComplete = (taskId) => {
-    // Add task to temporary animation list
-    setCompletingTaskIds((previous) => {
-      if (previous.includes(taskId)) {
-        return previous;
-      }
+  const [completingTaskIds, setCompletingTaskIds] =
+  useState([]);
 
-      return [...previous, taskId];
-    });
+const handleComplete = (taskId) => {
+  if (completingTaskIds.includes(taskId)) {
+    return;
+  }
 
-    // Mark completed immediately
+  // Start completed animation
+  setCompletingTaskIds((previous) => [
+    ...previous,
+    taskId,
+  ]);
+
+  // Give the user time to see:
+  // ✓ tick
+  // strike-through
+  // COMPLETED
+  setTimeout(() => {
     completeTask(taskId);
 
-    // Keep visible for 1.5 seconds
-    setTimeout(() => {
-      setCompletingTaskIds((previous) =>
-        previous.filter(
-          (id) => id !== taskId
-        )
-      );
-    }, 1500);
-  };
+    setCompletingTaskIds((previous) =>
+      previous.filter(
+        (id) => id !== taskId
+      )
+    );
+  }, 1000);
+};
 
   /* =====================================================
      EDIT
@@ -247,6 +185,8 @@ function Dashboard() {
 
         </div>
 
+        {/* ADD WORK */}
+
         <button
           type="button"
           onClick={handleAddButton}
@@ -265,8 +205,11 @@ function Dashboard() {
             hover:bg-blue-700
           "
         >
+
           <Plus size={20} />
+
           Add Work
+
         </button>
 
       </div>
@@ -291,9 +234,7 @@ function Dashboard() {
               </p>
 
               <h2 className="mt-2 text-3xl font-bold text-gray-900">
-                {todayTasks.filter(
-                  (task) => !task.completed
-                ).length}
+                {todayTasks.length}
               </h2>
 
             </div>
@@ -384,11 +325,7 @@ function Dashboard() {
           </div>
 
           <span className="text-sm text-gray-500">
-            {
-              todayTasks.filter(
-                (task) => !task.completed
-              ).length
-            } tasks
+            {todayTasks.length} tasks
           </span>
 
         </div>
@@ -396,21 +333,18 @@ function Dashboard() {
 
         {todayTasks.length > 0 ? (
 
-          <div className="space-y-4">
+          todayTasks.map((task) => (
 
-            {todayTasks.map((task) => (
+            <TaskCard
+  key={task.id}
+  task={task}
+  isCompleting={completingTaskIds.includes(task.id)}
+  onComplete={handleComplete}
+  onEdit={handleEdit}
+  onDelete={handleDelete}
+/>
 
-              <TaskCard
-                key={task.id}
-                task={task}
-                onComplete={handleComplete}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-
-            ))}
-
-          </div>
+          ))
 
         ) : (
 
@@ -454,31 +388,23 @@ function Dashboard() {
             </div>
 
             <span className="rounded-full bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600">
-              {
-                dueTasks.filter(
-                  (task) => !task.completed
-                ).length
-              } due
+              {dueTasks.length} due
             </span>
 
           </div>
 
 
-          <div className="space-y-4">
+          {dueTasks.map((task) => (
 
-            {dueTasks.map((task) => (
-
-              <TaskCard
-                key={task.id}
-                task={task}
-                onComplete={handleComplete}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-
-            ))}
-
-          </div>
+            <TaskCard
+  key={task.id}
+  task={task}
+  isCompleting={completingTaskIds.includes(task.id)}
+  onComplete={handleComplete}
+  onEdit={handleEdit}
+  onDelete={handleDelete}
+/>
+          ))}
 
         </div>
 

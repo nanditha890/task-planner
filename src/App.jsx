@@ -1,8 +1,4 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
 
@@ -13,64 +9,91 @@ import AnalyticsPage from "./pages/AnalyticsPage";
 import HistoryPage from "./pages/HistoryPage";
 import SettingsPage from "./pages/SettingsPage";
 
-import { TaskProvider } from "./context/TaskContext";
-
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 
 function App() {
-
   return (
+    <BrowserRouter>
+      <Routes>
 
-    <TaskProvider>
+        {/* ================================
+            LOGIN
+        ================================= */}
 
-      <BrowserRouter>
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
 
-        <div className="min-h-screen bg-gray-50">
+        {/* ================================
+            SIGNUP
+        ================================= */}
 
-          <Sidebar />
+        <Route
+          path="/signup"
+          element={<SignupPage />}
+        />
 
-          <main className="ml-64 min-h-screen p-8">
+        {/* ================================
+            MAIN APPLICATION
+        ================================= */}
 
-            <Routes>
+        <Route
+          path="/*"
+          element={
+            <div className="min-h-screen bg-gray-50">
 
-              <Route
-                path="/"
-                element={<Dashboard />}
-              />
+              {/* SIDEBAR */}
 
-              <Route
-                path="/calendar"
-                element={<CalendarPage />}
-              />
+              <Sidebar />
 
-              <Route
-                path="/tasks"
-                element={<TasksPage />}
-              />
+              {/* MAIN CONTENT */}
 
-              <Route
-                path="/analytics"
-                element={<AnalyticsPage />}
-              />
+              <main className="ml-64 min-h-screen p-8">
 
-              <Route
-                path="/history"
-                element={<HistoryPage />}
-              />
+                <Routes>
 
-              <Route
-                path="/settings"
-                element={<SettingsPage />}
-              />
+                  <Route
+                    path="/"
+                    element={<Dashboard />}
+                  />
 
-            </Routes>
+                  <Route
+                    path="/calendar"
+                    element={<CalendarPage />}
+                  />
 
-          </main>
+                  <Route
+                    path="/tasks"
+                    element={<TasksPage />}
+                  />
 
-        </div>
+                  <Route
+                    path="/analytics"
+                    element={<AnalyticsPage />}
+                  />
 
-      </BrowserRouter>
+                  <Route
+                    path="/history"
+                    element={<HistoryPage />}
+                  />
 
-    </TaskProvider>
+                  <Route
+                    path="/settings"
+                    element={<SettingsPage />}
+                  />
+
+                </Routes>
+
+              </main>
+
+            </div>
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
   );
 }
 
