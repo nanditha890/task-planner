@@ -11,10 +11,12 @@ import {
 } from "lucide-react";
 
 import TaskModal from "../components/TaskModal";
+
 import {
   useTasks,
   getToday,
 } from "../context/TaskContext";
+
 
 function TasksPage() {
   // =====================================================
@@ -28,12 +30,13 @@ function TasksPage() {
     deleteTask,
     updateTask,
   } = useTasks();
-
   // =====================================================
   // STATE
   // =====================================================
 
   const [filter, setFilter] = useState("all");
+
+  const [completingTaskIds, setCompletingTaskIds] = useState([]);
 
   const [search, setSearch] = useState("");
 
@@ -75,10 +78,11 @@ function TasksPage() {
 }
 
     // DUE
-    if (filter === "due") {
+   if (filter === "due") {
   return (
-    !task.completed &&
-    task.date < getToday()
+    (task.date < getToday() &&
+      !task.completed) ||
+    completingTaskIds.includes(task.id)
   );
 }
     // COMPLETED
@@ -117,8 +121,24 @@ const dueCount = tasks.filter(
   // =====================================================
 
   const handleComplete = (id) => {
-    completeTask(id);
-  };
+  // First show the completed animation
+  setCompletingTaskIds((previous) => [
+    ...previous,
+    id,
+  ]);
+
+  // Mark task as completed
+  completeTask(id);
+
+  // Remove the animation state after the animation finishes
+  setTimeout(() => {
+    setCompletingTaskIds((previous) =>
+      previous.filter(
+        (taskId) => taskId !== id
+      )
+    );
+  }, 500);
+};
 
   // =====================================================
   // EDIT

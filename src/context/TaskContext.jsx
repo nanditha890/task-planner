@@ -122,74 +122,85 @@ export function TaskProvider({ children }) {
   ======================================================= */
 
   const getCurrentUserProfile = async () => {
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    console.error(
-      "User not found:",
-      userError
-    );
+    if (userError || !user) {
+      console.error(
+        "User not found:",
+        userError
+      );
 
-    return null;
-  }
+      return null;
+    }
 
-  const {
-    data: profile,
-    error: profileError,
-  } = await supabase
-    .from("profiles")
-    .select("id, full_name")
-    .eq("id", user.id)
-    .single();
+    /* =====================================================
+       GET PROFILE FROM DATABASE
+    ===================================================== */
 
-  /*
-    Priority:
+    const {
+      data: profile,
+      error: profileError,
+    } = await supabase
+      .from("profiles")
+      .select("id, full_name, email")
+      .eq("id", user.id)
+      .single();
 
-    1. profiles.full_name
-    2. Auth Display Name
-    3. Auth name
-    4. Unknown User
+    /* =====================================================
+       DISPLAY NAME
+       Priority:
+       1. Auth Display Name
+       2. profiles.full_name
+       3. Unknown User
 
-    Email is NOT used as the display name.
-  */
+       IMPORTANT:
+       DO NOT USE EMAIL AS NAME FALLBACK
+    ===================================================== */
 
-  if (profileError || !profile) {
-    console.warn(
-      "Profile not found. Using Auth Display Name."
-    );
+    const displayName =
+      user.user_metadata?.full_name?.trim() ||
+      profile?.full_name?.trim() ||
+      "Unknown User";
+
+    if (profileError) {
+      console.warn(
+        "Profile not found. Using Auth Display Name:",
+        profileError
+      );
+    }
 
     return {
       id: user.id,
 
-      full_name:
-        user.user_metadata?.full_name ||
-        user.user_metadata?.name ||
-        "Unknown User",
+      full_name: displayName,
+
+      /*
+       * Email is now stored in profiles.
+       * Auth email remains as fallback.
+       */
+      email:
+        profile?.email ||
+        user.email ||
+        null,
     };
-  }
-
-  return {
-    id: profile.id,
-
-    full_name:
-      profile.full_name ||
-      user.user_metadata?.full_name ||
-      user.user_metadata?.name ||
-      "Unknown User",
   };
-};
 
   /* =======================================================
      LOAD TASKS FROM SUPABASE
+
+     IMPORTANT:
+     ALL AUTHENTICATED USERS CAN SEE ALL TASKS.
   ======================================================= */
 
   const loadTasks = async (user = currentUser) => {
     if (!user) {
       setTasks([]);
+
       setLoading(false);
+
       return;
     }
 
@@ -201,13 +212,22 @@ export function TaskProvider({ children }) {
     } = await supabase
       .from("tasks")
       .select("*")
-      .eq("created_by_id", user.id)
       .order("date", {
         ascending: true,
       })
       .order("time", {
         ascending: true,
       });
+
+    console.log(
+      "TASKS FROM SUPABASE:",
+      data
+    );
+
+    console.log(
+      "TASK LOAD ERROR:",
+      error
+    );
 
     if (error) {
       console.error(
@@ -220,9 +240,10 @@ export function TaskProvider({ children }) {
       return;
     }
 
-    const formattedTasks = (data || []).map(
-      (task) => {
-        const formattedTask = formatTask(task);
+    const formattedTasks =
+      (data || []).map((task) => {
+        const formattedTask =
+          formatTask(task);
 
         /*
           Automatically calculate the correct
@@ -242,10 +263,19 @@ export function TaskProvider({ children }) {
             formattedTask.date
           ),
         };
-      }
+      });
+
+    console.log(
+      "FORMATTED TASKS:",
+      formattedTasks
     );
 
     setTasks(formattedTasks);
+
+    console.log(
+      "TASKS WERE SET:",
+      formattedTasks.length
+    );
 
     setLoading(false);
   };
@@ -256,7 +286,8 @@ export function TaskProvider({ children }) {
 
   useEffect(() => {
     const initialize = async () => {
-      const user = await loadCurrentUser();
+      const user =
+        await loadCurrentUser();
 
       if (user) {
         await loadTasks(user);
@@ -277,7 +308,8 @@ export function TaskProvider({ children }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        const user = session?.user || null;
+        const user =
+          session?.user || null;
 
         setCurrentUser(user);
 
@@ -310,8 +342,23 @@ export function TaskProvider({ children }) {
       return null;
     }
 
+    /* ==========================================
+       TASK DATE
+    ========================================== */
+
     const taskDate =
       taskData.date || getToday();
+
+    /* ==========================================
+       TASK TIME
+    ========================================== */
+
+    const taskTime =
+      taskData.time || null;
+
+    /* ==========================================
+       CREATE TASK
+    ========================================== */
 
     const newTask = {
       title:
@@ -322,8 +369,7 @@ export function TaskProvider({ children }) {
 
       date: taskDate,
 
-      time:
-        taskData.time || null,
+      time: taskTime,
 
       priority:
         taskData.priority || "Medium",
@@ -347,14 +393,20 @@ export function TaskProvider({ children }) {
 
       completed_by_id: null,
 
-completed_by_name: null,
+      completed_by_name: null,
 
-completed_at: null,
+      completed_at: null,
 
-updated_by_id: profile.id,
+      updated_by_id:
+        profile.id,
 
-updated_by_name: profile.full_name,
+      updated_by_name:
+        profile.full_name,
     };
+
+    /* ==========================================
+       INSERT TASK
+    ========================================== */
 
     const {
       data,
@@ -374,13 +426,197 @@ updated_by_name: profile.full_name,
       return null;
     }
 
+    console.log(
+      "TASK CREATED:",
+      data
+    );
+
+    /* ==========================================
+       FORMAT TASK
+    ========================================== */
+
     const taskForApp =
       formatTask(data);
+
+    /* ==========================================
+       ADD TASK TO UI
+    ========================================== */
 
     setTasks((previousTasks) => [
       ...previousTasks,
       taskForApp,
     ]);
+
+    /* ==========================================
+       SEND TASK CREATED EMAIL TO ALL USERS
+    ========================================== */
+
+    try {
+      console.log(
+        "Getting all users for TASK CREATED email..."
+      );
+
+      const {
+        data: allProfiles,
+        error: profilesError,
+      } = await supabase
+        .from("profiles")
+        .select(
+          "id, full_name, email"
+        );
+
+      if (profilesError) {
+        console.error(
+          "ERROR GETTING ALL USER PROFILES:",
+          profilesError
+        );
+      } else {
+        console.log(
+          "ALL USERS FOR TASK CREATED EMAIL:",
+          allProfiles
+        );
+
+        for (const recipient of allProfiles || []) {
+          if (!recipient.email) {
+            console.warn(
+              "Skipping user without email:",
+              recipient
+            );
+
+            continue;
+          }
+
+          try {
+            console.log(
+              "Sending TASK CREATED email to:",
+              recipient.email
+            );
+
+            const {
+              data: emailResponse,
+              error: emailError,
+            } = await supabase.functions.invoke(
+              "smart-task",
+              {
+                body: {
+                  to: recipient.email,
+
+                  type: "created",
+
+                  task: {
+                    ...data,
+
+                    createdByName:
+                      profile.full_name,
+
+                    createdAt:
+                      data.created_at,
+                  },
+                },
+              }
+            );
+
+            if (emailError) {
+              console.error(
+                "TASK CREATED EMAIL ERROR:",
+                recipient.email,
+                emailError
+              );
+            } else {
+              console.log(
+                "TASK CREATED EMAIL SENT:",
+                recipient.email,
+                emailResponse
+              );
+            }
+          } catch (emailError) {
+            console.error(
+              "TASK CREATED EMAIL REQUEST FAILED:",
+              recipient.email,
+              emailError
+            );
+          }
+        }
+      }
+    } catch (emailError) {
+      console.error(
+        "TASK CREATED EMAIL SYSTEM FAILED:",
+        emailError
+      );
+    }
+
+    /* ==========================================
+       CREATE EMAIL REMINDER
+
+       IMPORTANT:
+       KEEPING YOUR CURRENT WORKING
+       REMINDER SYSTEM UNCHANGED FOR NOW.
+    ========================================== */
+
+    const reminderMinutes =
+      Number(taskData.reminder || 0);
+
+    if (
+      reminderMinutes > 0 &&
+      taskDate &&
+      taskTime &&
+      profile.email
+    ) {
+      try {
+        /* =====================================
+           COMBINE DATE + TIME
+        ===================================== */
+
+        const taskDateTime =
+          new Date(
+            `${taskDate}T${taskTime}`
+          );
+
+        /* =====================================
+           CALCULATE REMINDER TIME
+        ===================================== */
+
+        const reminderAt =
+          new Date(
+            taskDateTime.getTime() -
+              reminderMinutes *
+                60 *
+                1000
+          );
+
+        const {
+          error: reminderError,
+        } = await supabase
+          .from("task_reminders")
+          .insert({
+            task_id: data.id,
+
+            user_id: profile.id,
+
+            email: profile.email,
+
+            reminder_minutes:
+              reminderMinutes,
+
+            reminder_at:
+              reminderAt.toISOString(),
+
+            sent: false,
+          });
+
+        if (reminderError) {
+          console.error(
+            "Error creating task reminder:",
+            reminderError
+          );
+        }
+      } catch (reminderError) {
+        console.error(
+          "Reminder creation failed:",
+          reminderError
+        );
+      }
+    }
 
     return taskForApp;
   };
@@ -389,120 +625,150 @@ updated_by_name: profile.full_name,
      UPDATE TASK
   ======================================================= */
 
- const updateTask = async (id, updatedData) => {
-  const existingTask = tasks.find(
-    (task) => task.id === id
-  );
+  const updateTask = async (
+    id,
+    updatedData
+  ) => {
+    const existingTask =
+      tasks.find(
+        (task) => task.id === id
+      );
 
-  if (!existingTask) {
-    console.error("Task not found:", id);
-    return null;
-  }
+    if (!existingTask) {
+      console.error(
+        "Task not found:",
+        id
+      );
 
-  const profile = await getCurrentUserProfile();
+      return null;
+    }
 
-  if (!profile) {
-    console.error(
-      "Cannot update task: user profile not found"
+    const profile =
+      await getCurrentUserProfile();
+
+    if (!profile) {
+      console.error(
+        "Cannot update task: user profile not found"
+      );
+
+      return null;
+    }
+
+    const newDate =
+      updatedData.date ??
+      existingTask.date;
+
+    let newStatus;
+
+    if (existingTask.completed) {
+      newStatus = "completed";
+    } else {
+      newStatus =
+        getTaskStatus(newDate);
+    }
+
+    const updatedTime =
+      getTimestamp();
+
+    const databaseUpdate = {
+      title:
+        updatedData.title ??
+        existingTask.title,
+
+      description:
+        updatedData.description ??
+        existingTask.description,
+
+      date: newDate,
+
+      time:
+        updatedData.time ??
+        existingTask.time,
+
+      priority:
+        updatedData.priority ??
+        existingTask.priority,
+
+      reminder:
+        updatedData.reminder ??
+        existingTask.reminder,
+
+      repeat:
+        updatedData.repeat ??
+        existingTask.repeat,
+
+      status: newStatus,
+
+      completed:
+        updatedData.completed ??
+        existingTask.completed,
+
+      updated_at: updatedTime,
+
+      updated_by_id:
+        profile.id,
+
+      updated_by_name:
+        profile.full_name,
+    };
+
+    const {
+      data,
+      error,
+    } = await supabase
+      .from("tasks")
+      .update(databaseUpdate)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(
+        "Error updating task:",
+        error
+      );
+
+      return null;
+    }
+
+    const updatedTask =
+      formatTask(data);
+
+    setTasks((previousTasks) =>
+      previousTasks.map(
+        (task) =>
+          task.id === id
+            ? updatedTask
+            : task
+      )
     );
-    return null;
-  }
 
-  const newDate =
-    updatedData.date ?? existingTask.date;
-
-  let newStatus;
-
-  if (existingTask.completed) {
-    newStatus = "completed";
-  } else {
-    newStatus = getTaskStatus(newDate);
-  }
-
-  const updatedTime = getTimestamp();
-
-  const databaseUpdate = {
-    title:
-      updatedData.title ??
-      existingTask.title,
-
-    description:
-      updatedData.description ??
-      existingTask.description,
-
-    date: newDate,
-
-    time:
-      updatedData.time ??
-      existingTask.time,
-
-    priority:
-      updatedData.priority ??
-      existingTask.priority,
-
-    reminder:
-      updatedData.reminder ??
-      existingTask.reminder,
-
-    repeat:
-      updatedData.repeat ??
-      existingTask.repeat,
-
-    status: newStatus,
-
-    completed:
-      updatedData.completed ??
-      existingTask.completed,
-
-    updated_at: updatedTime,
-
-    updated_by_id: profile.id,
-
-    updated_by_name: profile.full_name,
+    return updatedTask;
   };
-
-  const {
-    data,
-    error,
-  } = await supabase
-    .from("tasks")
-    .update(databaseUpdate)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error(
-      "Error updating task:",
-      error
-    );
-
-    return null;
-  }
-
-  const updatedTask = formatTask(data);
-
-  setTasks((previousTasks) =>
-    previousTasks.map((task) =>
-      task.id === id
-        ? updatedTask
-        : task
-    )
-  );
-
-  return updatedTask;
-};
 
   /* =======================================================
      COMPLETE TASK
   ======================================================= */
 
   const completeTask = async (id) => {
+    /* ==========================================
+       GET COMPLETION TIME
+    ========================================== */
+
     const completedTime =
       getTimestamp();
 
+    /* ==========================================
+       GET CURRENT USER PROFILE
+    ========================================== */
+
     const profile =
       await getCurrentUserProfile();
+
+    console.log(
+      "COMPLETE TASK PROFILE:",
+      profile
+    );
 
     if (!profile) {
       console.error(
@@ -512,31 +778,77 @@ updated_by_name: profile.full_name,
       return;
     }
 
+    /* ==========================================
+       FIND TASK
+    ========================================== */
+
+    const existingTask =
+      tasks.find(
+        (task) => task.id === id
+      );
+
+    if (!existingTask) {
+      console.error(
+        "Cannot complete task: task not found:",
+        id
+      );
+
+      return;
+    }
+
+    /* ==========================================
+       UPDATE TASK IN SUPABASE
+    ========================================== */
+
+    console.log(
+      "COMPLETION DATA:",
+      {
+        completed_by_id:
+          profile.id,
+
+        completed_by_name:
+          profile.full_name,
+
+        completed_at:
+          completedTime,
+      }
+    );
+
     const {
       data,
       error,
     } = await supabase
       .from("tasks")
       .update({
-  completed: true,
+        completed: true,
 
-  status: "completed",
+        status: "completed",
 
-  completed_at: completedTime,
+        completed_at:
+          completedTime,
 
-  completed_by_id: profile.id,
+        completed_by_id:
+          profile.id,
 
-  completed_by_name: profile.full_name,
+        completed_by_name:
+          profile.full_name,
 
-  updated_at: completedTime,
+        updated_at:
+          completedTime,
 
-  updated_by_id: profile.id,
+        updated_by_id:
+          profile.id,
 
-  updated_by_name: profile.full_name,
-})
+        updated_by_name:
+          profile.full_name,
+      })
       .eq("id", id)
       .select()
       .single();
+
+    /* ==========================================
+       STOP IF DATABASE UPDATE FAILED
+    ========================================== */
 
     if (error) {
       console.error(
@@ -547,16 +859,132 @@ updated_by_name: profile.full_name,
       return;
     }
 
+    console.log(
+      "TASK COMPLETED IN SUPABASE:",
+      data
+    );
+
+    /* ==========================================
+       UPDATE TASK IN UI
+    ========================================== */
+
     const completedTask =
       formatTask(data);
 
     setTasks((previousTasks) =>
-      previousTasks.map((task) =>
-        task.id === id
-          ? completedTask
-          : task
+      previousTasks.map(
+        (task) =>
+          task.id === id
+            ? completedTask
+            : task
       )
     );
+
+    /* ==========================================
+       SEND TASK COMPLETED EMAIL TO ALL USERS
+    ========================================== */
+
+    try {
+      console.log(
+        "Getting all users for TASK COMPLETED email..."
+      );
+
+      const {
+        data: allProfiles,
+        error: profilesError,
+      } = await supabase
+        .from("profiles")
+        .select(
+          "id, full_name, email"
+        );
+
+      if (profilesError) {
+        console.error(
+          "ERROR GETTING ALL USER PROFILES:",
+          profilesError
+        );
+      } else {
+        console.log(
+          "ALL USERS FOR TASK COMPLETED EMAIL:",
+          allProfiles
+        );
+
+        for (const recipient of allProfiles || []) {
+          if (!recipient.email) {
+            console.warn(
+              "Skipping user without email:",
+              recipient
+            );
+
+            continue;
+          }
+
+          try {
+            console.log(
+              "Sending TASK COMPLETED email to:",
+              recipient.email
+            );
+
+            const {
+              data: emailResponse,
+              error: emailError,
+            } = await supabase.functions.invoke(
+              "smart-task",
+              {
+                body: {
+                  to: recipient.email,
+
+                  type: "completed",
+
+                  task: {
+                    ...data,
+
+                    createdByName:
+                      data.created_by_name,
+
+                    createdAt:
+                      data.created_at,
+
+                    completedByName:
+                      profile.full_name,
+
+                    completedAt:
+                      data.completed_at,
+                  },
+                },
+              }
+            );
+
+            if (emailError) {
+              console.error(
+                "TASK COMPLETED EMAIL ERROR:",
+                recipient.email,
+                emailError
+              );
+            } else {
+              console.log(
+                "TASK COMPLETED EMAIL SENT:",
+                recipient.email,
+                emailResponse
+              );
+            }
+          } catch (emailError) {
+            console.error(
+              "TASK COMPLETED EMAIL REQUEST FAILED:",
+              recipient.email,
+              emailError
+            );
+          }
+        }
+      }
+    } catch (emailError) {
+      console.error(
+        "TASK COMPLETED EMAIL SYSTEM FAILED:",
+        emailError
+      );
+    }
+
+    return completedTask;
   };
 
   /* =======================================================
@@ -591,32 +1019,36 @@ updated_by_name: profile.full_name,
      REFRESH DUE STATUS
   ======================================================= */
 
-  const refreshTaskStatuses = async () => {
-    setTasks((previousTasks) =>
-      previousTasks.map((task) => {
-        if (task.completed) {
-          return {
-            ...task,
-            status: "completed",
-          };
-        }
+  const refreshTaskStatuses =
+    async () => {
+      setTasks(
+        (previousTasks) =>
+          previousTasks.map(
+            (task) => {
+              if (task.completed) {
+                return {
+                  ...task,
+                  status: "completed",
+                };
+              }
 
-        if (
-          isPastDate(task.date)
-        ) {
-          return {
-            ...task,
-            status: "due",
-          };
-        }
+              if (
+                isPastDate(task.date)
+              ) {
+                return {
+                  ...task,
+                  status: "due",
+                };
+              }
 
-        return {
-          ...task,
-          status: "pending",
-        };
-      })
-    );
-  };
+              return {
+                ...task,
+                status: "pending",
+              };
+            }
+          )
+      );
+    };
 
   /* =======================================================
      REFRESH STATUS WHEN APP OPENS
