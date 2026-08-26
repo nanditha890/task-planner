@@ -17,46 +17,35 @@ function SignupPage() {
   // SIGN UP
   // =====================================================
 
-  const handleSignup = async (event) => {
-    event.preventDefault();
+ const handleSignup = async (event) => {
+  event.preventDefault();
 
-    setError("");
-    setSuccess("");
-    setLoading(true);
+  setError("");
+  setSuccess("");
+  setLoading(true);
 
-    try {
-      const trimmedName = name.trim();
-      const trimmedEmail = email.trim();
+  try {
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
 
-      // =================================================
-      // VALIDATION
-      // =================================================
+    // Validation
+    if (!trimmedName) {
+      throw new Error("Please enter your display name.");
+    }
 
-      if (!trimmedName) {
-        throw new Error("Please enter your display name.");
-      }
+    if (!trimmedEmail) {
+      throw new Error("Please enter your email.");
+    }
 
-      if (!trimmedEmail) {
-        throw new Error("Please enter your email.");
-      }
+    if (password.length < 6) {
+      throw new Error("Password must be at least 6 characters.");
+    }
 
-      if (password.length < 6) {
-        throw new Error(
-          "Password must be at least 6 characters."
-        );
-      }
-
-      // =================================================
-      // CREATE SUPABASE AUTH USER
-      // =================================================
-
-      const {
-        data,
-        error: signupError,
-      } = await supabase.auth.signUp({
+    // Create Auth user
+    const { data, error: signupError } =
+      await supabase.auth.signUp({
         email: trimmedEmail,
-        password: password,
-
+        password,
         options: {
           data: {
             full_name: trimmedName,
@@ -64,62 +53,36 @@ function SignupPage() {
         },
       });
 
-      if (signupError) {
-        throw signupError;
-      }
-
-      if (!data.user) {
-        throw new Error(
-          "Account could not be created."
-        );
-      }
-
-      // =================================================
-      // CREATE PROFILE
-      // =================================================
-
-      const { error: profileError } =
-  await supabase
-    .from("profiles")
-    .insert({
-      id: data.user.id,
-      full_name: trimmedName,
-    });
-
-      if (profileError) {
-        throw profileError;
-      }
-
-      // =================================================
-      // SUCCESS
-      // =================================================
-
-      setSuccess(
-        "Account created successfully!"
-      );
-
-      setName("");
-      setEmail("");
-      setPassword("");
-
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
-
-    } catch (error) {
-      console.error(
-        "Signup error:",
-        error
-      );
-
-      setError(
-        error.message ||
-        "Unable to create account."
-      );
-    } finally {
-      setLoading(false);
+    if (signupError) {
+      throw signupError;
     }
-  };
+
+    if (!data?.user) {
+      throw new Error("Account could not be created.");
+    }
+
+    // Signup succeeded
+    setSuccess("Account created successfully! Redirecting to login...");
+
+    setName("");
+    setEmail("");
+    setPassword("");
+
+    // Go to login
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
+
+  } catch (error) {
+    console.error("Signup error:", error);
+
+    setError(
+      error?.message || "Unable to create account."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   // =====================================================
   // UI
