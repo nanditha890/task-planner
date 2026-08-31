@@ -31,12 +31,33 @@ export function AuthProvider({ children }) {
   }, []);
 
   const getCurrentUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
 
-    setUser(user ?? null);
-    setLoading(false);
+      if (error) {
+        console.error(
+          "Error getting current session:",
+          error
+        );
+
+        setUser(null);
+        return;
+      }
+
+      setUser(session?.user ?? null);
+    } catch (error) {
+      console.error(
+        "Error getting current session:",
+        error
+      );
+
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const login = async (email, password) => {
@@ -106,3 +127,4 @@ export function useAuth() {
 }
 
 export default AuthContext;
+

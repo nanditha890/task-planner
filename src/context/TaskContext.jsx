@@ -96,45 +96,61 @@ export function TaskProvider({ children }) {
   ======================================================= */
 
   const loadCurrentUser = async () => {
+  try {
     const {
-      data: { user },
+      data: { session },
       error,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getSession();
 
     if (error) {
       console.error(
-        "Error getting current user:",
+        "Error getting current session:",
         error
       );
 
       setCurrentUser(null);
-
       return null;
     }
+
+    const user = session?.user ?? null;
 
     setCurrentUser(user);
 
     return user;
-  };
+  } catch (error) {
+    console.error(
+      "Error getting current session:",
+      error
+    );
+
+    setCurrentUser(null);
+
+    return null;
+  }
+};
 
   /* =======================================================
      GET CURRENT USER PROFILE
   ======================================================= */
 
   const getCurrentUserProfile = async () => {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
 
-    if (userError || !user) {
+  const user = session?.user ?? null;
+
+  if (sessionError || !user) {
+    if (sessionError) {
       console.error(
-        "User not found:",
-        userError
+        "Error getting current session:",
+        sessionError
       );
-
-      return null;
     }
+
+    return null;
+  }
 
     /* =====================================================
        GET PROFILE FROM DATABASE
