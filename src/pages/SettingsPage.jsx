@@ -5,6 +5,7 @@ import {
   User,
   Palette,
   Save,
+  CheckCircle2,
 } from "lucide-react";
 
 import { supabase } from "../lib/supabase";
@@ -245,295 +246,737 @@ function SettingsPage() {
   // =====================================================
 
   return (
-    <div className="max-w-4xl space-y-8">
+  <div className="mx-auto max-w-4xl space-y-6 sm:space-y-8">
+
+    {/* ================= HEADER ================= */}
+
+    <div>
+      <h1
+        className="
+          text-2xl
+          font-bold
+          tracking-tight
+          text-slate-900
+          dark:text-white
+          sm:text-3xl
+        "
+      >
+        Settings
+      </h1>
+
+      <p
+        className="
+          mt-1
+          text-sm
+          text-slate-500
+          dark:text-slate-400
+          sm:text-base
+        "
+      >
+        Manage your TaskFlow preferences.
+      </p>
+    </div>
+
+
+    {/* ================= ERROR ================= */}
+
+    {error && (
+      <div
+        role="alert"
+        className="
+          rounded-2xl
+          border
+          border-red-200
+          bg-red-50
+          px-4
+          py-3
+          text-sm
+          text-red-600
+          dark:border-red-900
+          dark:bg-red-950/30
+          dark:text-red-400
+        "
+      >
+        {error}
+      </div>
+    )}
+
+
+    {/* ================= PROFILE ================= */}
+
+    <section
+      className="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        shadow-sm
+        dark:border-slate-700
+        dark:bg-slate-800
+      "
+    >
+      {/* SECTION HEADER */}
+
+      <div
+        className="
+          flex
+          items-center
+          gap-3
+          border-b
+          border-slate-100
+          px-5
+          py-5
+          dark:border-slate-700
+          sm:px-6
+        "
+      >
+        <div
+          className="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-blue-50
+            text-blue-600
+            dark:bg-blue-950/50
+            dark:text-blue-400
+          "
+        >
+          <User size={21} />
+        </div>
+
+        <div>
+          <h2
+            className="
+              font-semibold
+              text-slate-900
+              dark:text-white
+            "
+          >
+            Profile
+          </h2>
+
+          <p
+            className="
+              mt-0.5
+              text-sm
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
+            Manage your basic information.
+          </p>
+        </div>
+      </div>
+
+
+      {/* PROFILE FIELDS */}
+
+      <div
+        className="
+          grid
+          grid-cols-1
+          gap-5
+          p-5
+          sm:p-6
+          md:grid-cols-2
+        "
+      >
+
+        {/* NAME */}
+
+        <div>
+          <label
+            htmlFor="name"
+            className="
+              text-sm
+              font-semibold
+              text-slate-700
+              dark:text-slate-300
+            "
+          >
+            Display Name
+          </label>
+
+          <input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(event) =>
+              setName(event.target.value)
+            }
+            placeholder="Your name"
+            className="
+              mt-2
+              w-full
+              rounded-xl
+              border
+              border-slate-200
+              bg-slate-50/50
+              px-4
+              py-3
+              text-sm
+              text-slate-900
+              outline-none
+              transition
+              placeholder:text-slate-400
+              focus:border-blue-400
+              focus:bg-white
+              focus:ring-4
+              focus:ring-blue-50
+              dark:border-slate-600
+              dark:bg-slate-700
+              dark:text-white
+              dark:focus:border-blue-500
+              dark:focus:ring-blue-950
+            "
+          />
+        </div>
+
+
+        {/* EMAIL */}
+
+        <div>
+          <label
+            htmlFor="email"
+            className="
+              text-sm
+              font-semibold
+              text-slate-700
+              dark:text-slate-300
+            "
+          >
+            Email
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            value={email}
+            disabled
+            className="
+              mt-2
+              w-full
+              cursor-not-allowed
+              rounded-xl
+              border
+              border-slate-200
+              bg-slate-100
+              px-4
+              py-3
+              text-sm
+              text-slate-500
+              outline-none
+              dark:border-slate-600
+              dark:bg-slate-700
+              dark:text-slate-400
+            "
+          />
+
+          <p className="mt-1.5 text-xs text-slate-400">
+            Email is managed by your account.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+
+    {/* ================= NOTIFICATIONS ================= */}
+
+    <section
+      className="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        shadow-sm
+        dark:border-slate-700
+        dark:bg-slate-800
+      "
+    >
 
       {/* HEADER */}
 
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Settings
-        </h1>
-
-        <p className="mt-1 text-gray-500 dark:text-gray-400">
-          Manage your TaskFlow preferences.
-        </p>
-      </div>
-
-      {/* ERROR */}
-
-      {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-          {error}
-        </div>
-      )}
-
-      {/* =================================================
-          PROFILE
-      ================================================= */}
-
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-
-        <div className="flex items-center gap-3">
-
-          <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
-            <User size={22} />
-          </div>
-
-          <div>
-            <h2 className="font-semibold text-gray-900 dark:text-white">
-              Profile
-            </h2>
-
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Manage your basic information.
-            </p>
-          </div>
-
+      <div
+        className="
+          flex
+          items-center
+          gap-3
+          border-b
+          border-slate-100
+          px-5
+          py-5
+          dark:border-slate-700
+          sm:px-6
+        "
+      >
+        <div
+          className="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-orange-50
+            text-orange-600
+            dark:bg-orange-950/40
+            dark:text-orange-400
+          "
+        >
+          <Bell size={21} />
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div>
+          <h2
+            className="
+              font-semibold
+              text-slate-900
+              dark:text-white
+            "
+          >
+            Notifications
+          </h2>
 
-          {/* NAME */}
-
-          <div>
-            <label
-              htmlFor="name"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Display Name
-            </label>
-
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(event) =>
-                setName(event.target.value)
-              }
-              placeholder="Your name"
-              className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-
-          {/* EMAIL */}
-
-          <div>
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Email
-            </label>
-
-            <input
-              id="email"
-              type="email"
-              value={email}
-              disabled
-              className="mt-2 w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-100 px-4 py-3 text-gray-500 outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400"
-            />
-
-            <p className="mt-1 text-xs text-gray-400">
-              Email is managed by your account.
-            </p>
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* =================================================
-          NOTIFICATIONS
-      ================================================= */}
-
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-
-        <div className="flex items-center gap-3">
-
-          <div className="rounded-xl bg-orange-50 p-3 text-orange-600">
-            <Bell size={22} />
-          </div>
-
-          <div>
-            <h2 className="font-semibold text-gray-900 dark:text-white">
-              Notifications
-            </h2>
-
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Control how you receive reminders.
-            </p>
-          </div>
-
-        </div>
-
-        <div className="mt-6 space-y-6">
-
-          {/* TASK REMINDERS */}
-
-          <div className="flex items-center justify-between gap-4">
-
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-200">
-                Task reminders
-              </p>
-
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Receive reminders for upcoming tasks.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                setNotifications(!notifications)
-              }
-              className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-                notifications
-                  ? "bg-blue-600"
-                  : "bg-gray-300"
-              }`}
-            >
-              <span
-                className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${
-                  notifications
-                    ? "left-6"
-                    : "left-1"
-                }`}
-              />
-            </button>
-
-          </div>
-
-          {/* EMAIL NOTIFICATIONS */}
-
-          <div className="flex items-center justify-between gap-4">
-
-            <div>
-              <p className="font-medium text-gray-800 dark:text-gray-200">
-                Email notifications
-              </p>
-
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Receive task reminders by email.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                setEmailNotifications(
-                  !emailNotifications
-                )
-              }
-              className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-                emailNotifications
-                  ? "bg-blue-600"
-                  : "bg-gray-300"
-              }`}
-            >
-              <span
-                className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${
-                  emailNotifications
-                    ? "left-6"
-                    : "left-1"
-                }`}
-              />
-            </button>
-
-          </div>
-
+          <p
+            className="
+              mt-0.5
+              text-sm
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
+            Control how you receive reminders.
+          </p>
         </div>
       </div>
 
-      {/* =================================================
-          APPEARANCE
-      ================================================= */}
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      {/* OPTIONS */}
 
-        <div className="flex items-center gap-3">
+      <div className="divide-y divide-slate-100 dark:divide-slate-700">
 
-          <div className="rounded-xl bg-purple-50 p-3 text-purple-600">
-            <Palette size={22} />
-          </div>
+        {/* TASK REMINDERS */}
 
-          <div>
-            <h2 className="font-semibold text-gray-900 dark:text-white">
-              Appearance
-            </h2>
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            gap-5
+            px-5
+            py-5
+            sm:px-6
+          "
+        >
+          <div className="min-w-0">
+            <p
+              className="
+                font-medium
+                text-slate-800
+                dark:text-slate-200
+              "
+            >
+              Task reminders
+            </p>
 
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Customize how the application looks.
+            <p
+              className="
+                mt-1
+                text-sm
+                leading-5
+                text-slate-500
+                dark:text-slate-400
+              "
+            >
+              Receive reminders for upcoming tasks.
             </p>
           </div>
 
-        </div>
 
-        <div className="mt-6 flex items-center justify-between">
-
-          <div>
-            <p className="font-medium text-gray-800 dark:text-gray-200">
-              Dark mode
-            </p>
-
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Use a darker color scheme.
-            </p>
-          </div>
+          {/* TOGGLE */}
 
           <button
             type="button"
+            role="switch"
+            aria-checked={notifications}
+            aria-label="Task reminders"
             onClick={() =>
-              setDarkMode(!darkMode)
+              setNotifications(!notifications)
             }
-            className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-              darkMode
-                ? "bg-blue-600"
-                : "bg-gray-300"
-            }`}
+            className={`
+              relative
+              h-7
+              w-12
+              shrink-0
+              rounded-full
+              transition
+              duration-200
+
+              ${
+                notifications
+                  ? "bg-blue-600"
+                  : "bg-slate-300 dark:bg-slate-600"
+              }
+            `}
           >
             <span
-              className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${
-                darkMode
-                  ? "left-6"
-                  : "left-1"
-              }`}
+              className={`
+                absolute
+                top-1
+                h-5
+                w-5
+                rounded-full
+                bg-white
+                shadow-sm
+                transition-all
+                duration-200
+
+                ${
+                  notifications
+                    ? "left-6"
+                    : "left-1"
+                }
+              `}
             />
           </button>
+        </div>
 
+
+        {/* EMAIL NOTIFICATIONS */}
+
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            gap-5
+            px-5
+            py-5
+            sm:px-6
+          "
+        >
+          <div className="min-w-0">
+            <p
+              className="
+                font-medium
+                text-slate-800
+                dark:text-slate-200
+              "
+            >
+              Email notifications
+            </p>
+
+            <p
+              className="
+                mt-1
+                text-sm
+                leading-5
+                text-slate-500
+                dark:text-slate-400
+              "
+            >
+              Receive task reminders by email.
+            </p>
+          </div>
+
+
+          {/* TOGGLE */}
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={emailNotifications}
+            aria-label="Email notifications"
+            onClick={() =>
+              setEmailNotifications(
+                !emailNotifications
+              )
+            }
+            className={`
+              relative
+              h-7
+              w-12
+              shrink-0
+              rounded-full
+              transition
+              duration-200
+
+              ${
+                emailNotifications
+                  ? "bg-blue-600"
+                  : "bg-slate-300 dark:bg-slate-600"
+              }
+            `}
+          >
+            <span
+              className={`
+                absolute
+                top-1
+                h-5
+                w-5
+                rounded-full
+                bg-white
+                shadow-sm
+                transition-all
+                duration-200
+
+                ${
+                  emailNotifications
+                    ? "left-6"
+                    : "left-1"
+                }
+              `}
+            />
+          </button>
         </div>
 
       </div>
+    </section>
 
-      {/* =================================================
-          SAVE
-      ================================================= */}
 
-      <div className="flex items-center justify-end gap-4">
+    {/* ================= APPEARANCE ================= */}
 
-        {saved && (
-          <span className="text-sm font-medium text-green-600">
-            Settings saved!
-          </span>
-        )}
+    <section
+      className="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        shadow-sm
+        dark:border-slate-700
+        dark:bg-slate-800
+      "
+    >
+
+      {/* HEADER */}
+
+      <div
+        className="
+          flex
+          items-center
+          gap-3
+          border-b
+          border-slate-100
+          px-5
+          py-5
+          dark:border-slate-700
+          sm:px-6
+        "
+      >
+        <div
+          className="
+            flex
+            h-11
+            w-11
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-purple-50
+            text-purple-600
+            dark:bg-purple-950/40
+            dark:text-purple-400
+          "
+        >
+          <Palette size={21} />
+        </div>
+
+        <div>
+          <h2
+            className="
+              font-semibold
+              text-slate-900
+              dark:text-white
+            "
+          >
+            Appearance
+          </h2>
+
+          <p
+            className="
+              mt-0.5
+              text-sm
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
+            Customize how the application looks.
+          </p>
+        </div>
+      </div>
+
+
+      {/* DARK MODE */}
+
+      <div
+        className="
+          flex
+          items-center
+          justify-between
+          gap-5
+          px-5
+          py-5
+          sm:px-6
+        "
+      >
+        <div className="min-w-0">
+          <p
+            className="
+              font-medium
+              text-slate-800
+              dark:text-slate-200
+            "
+          >
+            Dark mode
+          </p>
+
+          <p
+            className="
+              mt-1
+              text-sm
+              leading-5
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
+            Use a darker color scheme.
+          </p>
+        </div>
+
+
+        {/* TOGGLE */}
 
         <button
           type="button"
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          role="switch"
+          aria-checked={darkMode}
+          aria-label="Dark mode"
+          onClick={() =>
+            setDarkMode(!darkMode)
+          }
+          className={`
+            relative
+            h-7
+            w-12
+            shrink-0
+            rounded-full
+            transition
+            duration-200
+
+            ${
+              darkMode
+                ? "bg-blue-600"
+                : "bg-slate-300 dark:bg-slate-600"
+            }
+          `}
         >
-          <Save size={18} />
+          <span
+            className={`
+              absolute
+              top-1
+              h-5
+              w-5
+              rounded-full
+              bg-white
+              shadow-sm
+              transition-all
+              duration-200
 
-          {saving
-            ? "Saving..."
-            : "Save Settings"}
+              ${
+                darkMode
+                  ? "left-6"
+                  : "left-1"
+              }
+            `}
+          />
         </button>
-
       </div>
 
+    </section>
+
+
+    {/* ================= SAVE AREA ================= */}
+
+    <div
+      className="
+        flex
+        flex-col
+        gap-3
+        pb-2
+        sm:flex-row
+        sm:items-center
+        sm:justify-end
+      "
+    >
+
+      {saved && (
+        <div
+          className="
+            flex
+            items-center
+            justify-center
+            gap-2
+            rounded-xl
+            bg-green-50
+            px-4
+            py-2
+            text-sm
+            font-medium
+            text-green-600
+            dark:bg-green-950/30
+            dark:text-green-400
+          "
+        >
+          <CheckCircle2 size={16} />
+          Settings saved!
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={saving}
+        className="
+          flex
+          w-full
+          items-center
+          justify-center
+          gap-2
+          rounded-xl
+          bg-blue-600
+          px-5
+          py-3
+          text-sm
+          font-semibold
+          text-white
+          shadow-sm
+          transition
+          hover:bg-blue-700
+          disabled:cursor-not-allowed
+          disabled:opacity-60
+          sm:w-auto
+        "
+      >
+        <Save size={18} />
+
+        {saving
+          ? "Saving..."
+          : "Save Settings"}
+      </button>
+
     </div>
-  );
+
+  </div>
+);
 }
 
 export default SettingsPage;

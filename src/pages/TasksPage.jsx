@@ -48,50 +48,55 @@ function TasksPage() {
   // FILTER + SEARCH
   // =====================================================
 
-  const filteredTasks = tasks.filter((task) => {
-    // SEARCH
-    const searchText = search.toLowerCase().trim();
+ const filteredTasks = tasks.filter((task) => {
+  // ================= SEARCH =================
 
-    const matchesSearch =
-      task.title
-        ?.toLowerCase()
-        .includes(searchText) ||
-      task.description
-        ?.toLowerCase()
-        .includes(searchText);
+  const searchText = search.trim().toLowerCase();
 
-    if (!matchesSearch) {
-      return false;
-    }
+  const taskTitle = String(
+    task.title || ""
+  ).toLowerCase();
 
-    // ALL
-    if (filter === "all") {
-      return true;
-    }
+  const taskDescription = String(
+    task.description || ""
+  ).toLowerCase();
 
-    // PENDING
-    if (filter === "pending") {
-  return (
-    !task.completed &&
-    task.date >= getToday()
-  );
-}
+  const matchesSearch =
+    searchText === "" ||
+    taskTitle.includes(searchText) ||
+    taskDescription.includes(searchText);
 
-    // DUE
-   if (filter === "due") {
-  return (
-    (task.date < getToday() &&
-      !task.completed) ||
-    completingTaskIds.includes(task.id)
-  );
-}
-    // COMPLETED
-    if (filter === "completed") {
-      return task.completed;
-    }
+  if (!matchesSearch) {
+    return false;
+  }
 
+  // ================= FILTER =================
+
+  if (filter === "all") {
     return true;
-  });
+  }
+
+  if (filter === "pending") {
+    return (
+      !task.completed &&
+      task.date >= getToday()
+    );
+  }
+
+  if (filter === "due") {
+    return (
+      (task.date < getToday() &&
+        !task.completed) ||
+      completingTaskIds.includes(task.id)
+    );
+  }
+
+  if (filter === "completed") {
+    return task.completed === true;
+  }
+
+  return true;
+});
 
   // =====================================================
   // COUNTS
@@ -211,71 +216,90 @@ const dueCount = tasks.filter(
   // =====================================================
 
   return (
-    <div className="space-y-8">
+  <div className="space-y-6 sm:space-y-8">
 
-      {/* =================================================
-          HEADER
-      ================================================= */}
+    {/* HEADER */}
 
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-
-        <div>
-
-          <h1 className="text-3xl font-bold text-gray-900">
-            Tasks
-          </h1>
-
-          <p className="mt-1 text-gray-500">
-            Manage all your scheduled work in one place.
-          </p>
-
-        </div>
-
-        {/* ADD WORK */}
-
-        <button
-          type="button"
-          onClick={handleAddButton}
+    <div
+      className="
+        flex
+        flex-col
+        gap-4
+        sm:flex-row
+        sm:items-center
+        sm:justify-between
+      "
+    >
+      <div>
+        <h1
           className="
-            flex
-            items-center
-            justify-center
-            gap-2
-            rounded-xl
-            bg-blue-600
-            px-5
-            py-3
-            font-medium
-            text-white
-            shadow-sm
-            transition
-            hover:bg-blue-700
+            text-2xl
+            font-bold
+            tracking-tight
+            text-slate-900
+            sm:text-3xl
           "
         >
+          Tasks
+        </h1>
 
-          <Plus size={20} />
-
-          Add Work
-
-        </button>
-
+        <p className="mt-1 text-sm text-slate-500 sm:text-base">
+          Manage all your scheduled work in one place.
+        </p>
       </div>
 
+      <button
+        type="button"
+        onClick={handleAddButton}
+        className="
+          flex
+          w-full
+          items-center
+          justify-center
+          gap-2
+          rounded-xl
+          bg-blue-600
+          px-5
+          py-3
+          text-sm
+          font-semibold
+          text-white
+          shadow-sm
+          transition
+          hover:bg-blue-700
+          sm:w-auto
+        "
+      >
+        <Plus size={19} />
+        Add Work
+      </button>
+    </div>
 
-      {/* =================================================
-          SEARCH
-      ================================================= */}
+
+    {/* SEARCH + FILTERS */}
+
+    <section
+      className="
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        p-4
+        shadow-sm
+        sm:p-5
+      "
+    >
+      {/* SEARCH */}
 
       <div className="relative">
-
         <Search
-          size={20}
+          size={19}
           className="
             absolute
             left-4
             top-1/2
             -translate-y-1/2
-            text-gray-400
+            text-slate-400
           "
         />
 
@@ -290,34 +314,41 @@ const dueCount = tasks.filter(
             w-full
             rounded-xl
             border
-            border-gray-200
-            bg-white
+            border-slate-200
+            bg-slate-50
             py-3
-            pl-12
+            pl-11
             pr-4
+            text-sm
+            text-slate-900
             outline-none
             transition
-            focus:border-blue-500
-            focus:ring-2
-            focus:ring-blue-100
+            placeholder:text-slate-400
+            focus:border-blue-400
+            focus:bg-white
+            focus:ring-4
+            focus:ring-blue-50
           "
         />
-
       </div>
 
 
-      {/* =================================================
-          FILTER BUTTONS
-      ================================================= */}
+      {/* FILTER BUTTONS */}
 
-      <div className="flex flex-wrap gap-3">
-
-        {/* ALL */}
-
+      <div
+        className="
+          mt-4
+          flex
+          gap-2
+          overflow-x-auto
+          pb-1
+        "
+      >
         <button
           type="button"
           onClick={() => setFilter("all")}
           className={`
+            shrink-0
             rounded-xl
             px-4
             py-2
@@ -327,21 +358,19 @@ const dueCount = tasks.filter(
 
             ${
               filter === "all"
-                ? "bg-blue-600 text-white"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
             }
           `}
         >
           All
         </button>
 
-
-        {/* PENDING */}
-
         <button
           type="button"
           onClick={() => setFilter("pending")}
           className={`
+            shrink-0
             rounded-xl
             px-4
             py-2
@@ -351,21 +380,19 @@ const dueCount = tasks.filter(
 
             ${
               filter === "pending"
-                ? "bg-blue-600 text-white"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
             }
           `}
         >
           Pending
         </button>
 
-
-        {/* DUE */}
-
         <button
           type="button"
           onClick={() => setFilter("due")}
           className={`
+            shrink-0
             rounded-xl
             px-4
             py-2
@@ -375,21 +402,19 @@ const dueCount = tasks.filter(
 
             ${
               filter === "due"
-                ? "bg-orange-500 text-white"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-orange-500 text-white shadow-sm"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
             }
           `}
         >
           Due
         </button>
 
-
-        {/* COMPLETED */}
-
         <button
           type="button"
           onClick={() => setFilter("completed")}
           className={`
+            shrink-0
             rounded-xl
             px-4
             py-2
@@ -399,513 +424,542 @@ const dueCount = tasks.filter(
 
             ${
               filter === "completed"
-                ? "bg-green-600 text-white"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-green-600 text-white shadow-sm"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
             }
           `}
         >
           Completed
         </button>
+      </div>
+    </section>
 
+
+    {/* SUMMARY CARDS */}
+
+    <section
+      className="
+        grid
+        grid-cols-2
+        gap-3
+        lg:grid-cols-4
+        lg:gap-5
+      "
+    >
+      {/* TOTAL */}
+
+      <div
+        className="
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          p-4
+          shadow-sm
+          sm:p-5
+        "
+      >
+        <p className="text-xs font-medium text-slate-500 sm:text-sm">
+          Total
+        </p>
+
+        <p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
+          {totalCount}
+        </p>
       </div>
 
+      {/* PENDING */}
 
-      {/* =================================================
-          SUMMARY CARDS
-      ================================================= */}
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
-
-        {/* TOTAL */}
-
-        <div className="
+      <div
+        className="
           rounded-2xl
           border
-          border-gray-200
-          bg-white
-          p-5
+          border-blue-100
+          bg-blue-50/40
+          p-4
           shadow-sm
-        ">
+          sm:p-5
+        "
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+              Pending
+            </p>
 
-          <p className="text-sm text-gray-500">
-            Total
-          </p>
+            <p className="mt-2 text-2xl font-bold text-blue-600 sm:text-3xl">
+              {pendingCount}
+            </p>
+          </div>
 
-          <p className="mt-2 text-3xl font-bold text-gray-900">
-            {totalCount}
-          </p>
-
+          <Clock3
+            size={20}
+            className="text-blue-500"
+          />
         </div>
-
-
-        {/* PENDING */}
-
-        <div className="
-          rounded-2xl
-          border
-          border-gray-200
-          bg-white
-          p-5
-          shadow-sm
-        ">
-
-          <p className="text-sm text-gray-500">
-            Pending
-          </p>
-
-          <p className="mt-2 text-3xl font-bold text-blue-600">
-            {pendingCount}
-          </p>
-
-        </div>
-
-
-        {/* DUE */}
-
-        <div className="
-          rounded-2xl
-          border
-          border-gray-200
-          bg-white
-          p-5
-          shadow-sm
-        ">
-
-          <p className="text-sm text-gray-500">
-            Due
-          </p>
-
-          <p className="mt-2 text-3xl font-bold text-orange-500">
-            {dueCount}
-          </p>
-
-        </div>
-
-
-        {/* COMPLETED */}
-
-        <div className="
-          rounded-2xl
-          border
-          border-gray-200
-          bg-white
-          p-5
-          shadow-sm
-        ">
-
-          <p className="text-sm text-gray-500">
-            Completed
-          </p>
-
-          <p className="mt-2 text-3xl font-bold text-green-600">
-            {completedCount}
-          </p>
-
-        </div>
-
       </div>
 
+      {/* DUE */}
 
-      {/* =================================================
-          RESULT COUNT
-      ================================================= */}
+      <div
+        className="
+          rounded-2xl
+          border
+          border-orange-100
+          bg-orange-50/40
+          p-4
+          shadow-sm
+          sm:p-5
+        "
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+              Due
+            </p>
 
-      <div className="text-sm text-gray-500">
+            <p className="mt-2 text-2xl font-bold text-orange-500 sm:text-3xl">
+              {dueCount}
+            </p>
+          </div>
 
+          <AlertCircle
+            size={20}
+            className="text-orange-500"
+          />
+        </div>
+      </div>
+
+      {/* COMPLETED */}
+
+      <div
+        className="
+          rounded-2xl
+          border
+          border-green-100
+          bg-green-50/40
+          p-4
+          shadow-sm
+          sm:p-5
+        "
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+              Completed
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-green-600 sm:text-3xl">
+              {completedCount}
+            </p>
+          </div>
+
+          <CheckCircle2
+            size={20}
+            className="text-green-500"
+          />
+        </div>
+      </div>
+    </section>
+
+
+    {/* RESULT COUNT */}
+
+    <div className="flex items-center justify-between gap-3">
+      <p className="text-sm text-slate-500">
         Showing{" "}
-        <span className="font-medium text-gray-700">
+        <span className="font-semibold text-slate-800">
           {filteredTasks.length}
         </span>{" "}
         {filteredTasks.length === 1
           ? "task"
           : "tasks"}
+      </p>
+    </div>
 
-      </div>
 
+    {/* TASK LIST */}
 
-      {/* =================================================
-          TASK LIST
-      ================================================= */}
+    <section className="space-y-3">
 
-      <div className="space-y-4">
+      {filteredTasks.length === 0 ? (
 
-        {filteredTasks.length === 0 ? (
-
-          <div className="
+        <div
+          className="
             rounded-2xl
             border
             border-dashed
-            border-gray-300
+            border-slate-300
             bg-white
-            p-10
+            px-5
+            py-10
             text-center
-          ">
-
+            shadow-sm
+          "
+        >
+          <div
+            className="
+              mx-auto
+              flex
+              h-14
+              w-14
+              items-center
+              justify-center
+              rounded-2xl
+              bg-slate-50
+            "
+          >
             <CheckCircle2
-              size={42}
-              className="mx-auto text-gray-300"
+              size={26}
+              className="text-slate-300"
             />
-
-            <h2 className="mt-4 text-lg font-semibold text-gray-700">
-              No tasks found
-            </h2>
-
-            <p className="mt-1 text-sm text-gray-400">
-
-              {search
-                ? "Try searching with a different keyword."
-                : "There are no tasks in this category."}
-
-            </p>
-
           </div>
 
-        ) : (
+          <h2 className="mt-4 text-lg font-semibold text-slate-700">
+            No tasks found
+          </h2>
 
-          filteredTasks.map((task) => (
+          <p className="mt-1 text-sm text-slate-400">
+            {search
+              ? "Try searching with a different keyword."
+              : "There are no tasks in this category."}
+          </p>
+        </div>
 
-            <div
+      ) : (
+
+        filteredTasks.map((task) => {
+
+          const isCompleting =
+            completingTaskIds.includes(task.id);
+
+          const visuallyCompleted =
+            task.completed || isCompleting;
+
+          return (
+            <article
               key={task.id}
               className={`
                 rounded-2xl
+                border
+                p-4
+                shadow-sm
                 transition-all
                 duration-300
+                sm:p-5
 
                 ${
-                  task.completed
-                    ? "border-green-200 bg-green-50/30"
+                  visuallyCompleted
+                    ? "border-green-200 bg-green-50/50"
                     : task.status === "due"
-                    ? "border-orange-200"
-                    : "border-gray-200"
+                    ? "border-orange-200 bg-white"
+                    : "border-slate-200 bg-white"
                 }
               `}
             >
 
-              {/* =================================================
-                  TASK CARD
-              ================================================= */}
+              <div
+                className="
+                  flex
+                  flex-col
+                  gap-4
+                  sm:flex-row
+                  sm:items-start
+                  sm:justify-between
+                "
+              >
 
-              <div className="relative">
+                {/* LEFT */}
 
                 <div
                   className="
-                    rounded-2xl
-                    border
-                    border-transparent
+                    flex
+                    min-w-0
+                    flex-1
+                    items-start
+                    gap-3
+                    sm:gap-4
                   "
                 >
 
-                  {/* TASK CARD CONTENT */}
+                  {/* COMPLETE */}
 
-                  <div className="p-0">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleComplete(task.id)
+                    }
+                    disabled={task.completed}
+                    className="mt-0.5 shrink-0"
+                    aria-label={
+                      task.completed
+                        ? "Completed"
+                        : "Complete task"
+                    }
+                  >
+                    {visuallyCompleted ? (
 
-                    <div className="
-                      flex
-                      items-start
-                      justify-between
-                      gap-4
-                      p-5
-                    ">
+                      <CheckCircle2
+                        size={28}
+                        className="text-green-500"
+                      />
 
-                      {/* LEFT */}
+                    ) : (
 
-                      <div className="
-                        flex
-                        min-w-0
-                        items-start
-                        gap-4
-                      ">
+                      <div
+                        className="
+                          h-7
+                          w-7
+                          rounded-full
+                          border-2
+                          border-slate-300
+                          transition
+                          hover:border-blue-500
+                          hover:bg-blue-50
+                        "
+                      />
 
-                        {/* CHECK BUTTON */}
+                    )}
+                  </button>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleComplete(task.id)
+
+                  {/* INFORMATION */}
+
+                  <div className="min-w-0 flex-1">
+
+                    <h3
+                      className={`
+                        break-words
+                        text-base
+                        font-semibold
+                        leading-6
+                        sm:text-lg
+
+                        ${
+                          visuallyCompleted
+                            ? "text-slate-400 line-through"
+                            : "text-slate-900"
+                        }
+                      `}
+                    >
+                      {task.title}
+                    </h3>
+
+
+                    {task.description && (
+                      <p
+                        className={`
+                          mt-1
+                          break-words
+                          text-sm
+                          leading-6
+
+                          ${
+                            visuallyCompleted
+                              ? "text-slate-400"
+                              : "text-slate-500"
                           }
-                          disabled={task.completed}
-                          className="
-                            mt-1
-                            shrink-0
-                          "
-                          aria-label={
-                            task.completed
-                              ? "Completed"
-                              : "Complete task"
-                          }
-                        >
-
-                          {task.completed ? (
-
-                            <CheckCircle2
-                              size={28}
-                              className="text-green-500"
-                            />
-
-                          ) : (
-
-                            <div
-                              className="
-                                flex
-                                h-7
-                                w-7
-                                items-center
-                                justify-center
-                                rounded-full
-                                border-2
-                                border-gray-300
-                                transition
-                                hover:border-blue-500
-                                hover:bg-blue-50
-                              "
-                            />
-
-                          )}
-
-                        </button>
+                        `}
+                      >
+                        {task.description}
+                      </p>
+                    )}
 
 
-                        {/* INFORMATION */}
+                    {/* DATE + TIME */}
 
-                        <div className="min-w-0">
-
-                          <h3
-                            className={`
-                              text-lg
-                              font-semibold
-
-                              ${
-                                task.completed
-                                  ? "text-gray-400 line-through"
-                                  : "text-gray-900"
-                              }
-                            `}
-                          >
-                            {task.title}
-                          </h3>
-
-
-                          {task.description && (
-
-                            <p
-                              className={`
-                                mt-1
-                                text-sm
-
-                                ${
-                                  task.completed
-                                    ? "text-gray-400"
-                                    : "text-gray-500"
-                                }
-                              `}
-                            >
-                              {task.description}
-                            </p>
-
-                          )}
-
-
-                          {/* DATE + TIME */}
-
-                          <div className="
-                            mt-3
-                            flex
-                            flex-wrap
-                            gap-4
-                            text-xs
-                            text-gray-500
-                          ">
-
-                            <span className="
-                              flex
-                              items-center
-                              gap-1
-                            ">
-
-                              <Clock3 size={14} />
-
-                              {task.time ||
-                                "No time set"}
-
-                            </span>
-
-
-                            <span>
-                              {task.date}
-                            </span>
-
-                          </div>
-
-                        </div>
-
-                      </div>
-
-
-                      {/* RIGHT */}
-
-                      <div className="
+                    <div
+                      className="
+                        mt-3
                         flex
-                        shrink-0
+                        flex-wrap
                         items-center
-                        gap-2
-                      ">
+                        gap-x-4
+                        gap-y-2
+                        text-xs
+                        text-slate-500
+                      "
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Clock3 size={14} />
+                        {task.time || "No time set"}
+                      </span>
 
-                        {/* STATUS */}
-
-                        {task.completed ? (
-
-                          <span className="
-                            flex
-                            items-center
-                            gap-1
-                            rounded-full
-                            bg-green-50
-                            px-3
-                            py-1
-                            text-xs
-                            font-medium
-                            text-green-600
-                          ">
-
-                            <CheckCircle2
-                              size={14}
-                            />
-
-                            COMPLETED
-
-                          </span>
-
-                        ) : task.status === "due" ? (
-
-                          <span className="
-                            flex
-                            items-center
-                            gap-1
-                            rounded-full
-                            bg-orange-50
-                            px-3
-                            py-1
-                            text-xs
-                            font-medium
-                            text-orange-600
-                          ">
-
-                            <AlertCircle
-                              size={14}
-                            />
-
-                            DUE
-
-                          </span>
-
-                        ) : (
-
-                          <span className="
-                            rounded-full
-                            bg-blue-50
-                            px-3
-                            py-1
-                            text-xs
-                            font-medium
-                            text-blue-600
-                          ">
-
-                            PENDING
-
-                          </span>
-
-                        )}
-
-
-                        {/* EDIT */}
-
-                        {!task.completed && (
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleEdit(task)
-                            }
-                            className="
-                              rounded-lg
-                              p-2
-                              text-gray-500
-                              transition
-                              hover:bg-blue-50
-                              hover:text-blue-600
-                            "
-                            title="Edit task"
-                          >
-
-                            <Pencil size={17} />
-
-                          </button>
-
-                        )}
-
-
-                        {/* DELETE */}
-
-                        {!task.completed && (
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleDelete(task.id)
-                            }
-                            className="
-                              rounded-lg
-                              p-2
-                              text-gray-500
-                              transition
-                              hover:bg-red-50
-                              hover:text-red-600
-                            "
-                            title="Delete task"
-                          >
-
-                            <Trash2 size={17} />
-
-                          </button>
-
-                        )}
-
-                      </div>
-
+                      <span>
+                        {task.date}
+                      </span>
                     </div>
 
                   </div>
+                </div>
+
+
+                {/* STATUS + ACTIONS */}
+
+                <div
+                  className="
+                    flex
+                    w-full
+                    flex-wrap
+                    items-center
+                    gap-2
+                    border-t
+                    border-slate-100
+                    pt-3
+                    sm:w-auto
+                    sm:shrink-0
+                    sm:border-0
+                    sm:pt-0
+                  "
+                >
+
+                  {/* STATUS */}
+
+                  {visuallyCompleted ? (
+
+                    <span
+                      className="
+                        flex
+                        items-center
+                        gap-1
+                        rounded-full
+                        bg-green-50
+                        px-3
+                        py-1.5
+                        text-xs
+                        font-medium
+                        text-green-600
+                      "
+                    >
+                      <CheckCircle2 size={14} />
+                      COMPLETED
+                    </span>
+
+                  ) : task.status === "due" ? (
+
+                    <span
+                      className="
+                        flex
+                        items-center
+                        gap-1
+                        rounded-full
+                        bg-orange-50
+                        px-3
+                        py-1.5
+                        text-xs
+                        font-medium
+                        text-orange-600
+                      "
+                    >
+                      <AlertCircle size={14} />
+                      DUE
+                    </span>
+
+                  ) : (
+
+                    <span
+                      className="
+                        rounded-full
+                        bg-blue-50
+                        px-3
+                        py-1.5
+                        text-xs
+                        font-medium
+                        text-blue-600
+                      "
+                    >
+                      PENDING
+                    </span>
+
+                  )}
+
+
+                  {/* ACTIONS */}
+
+                  {!task.completed && (
+                    <div className="ml-auto flex items-center gap-2 sm:ml-0">
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleEdit(task)
+                        }
+                        className="
+                          flex
+                          h-9
+                          w-9
+                          items-center
+                          justify-center
+                          rounded-lg
+                          border
+                          border-slate-200
+                          text-slate-500
+                          transition
+                          hover:border-blue-200
+                          hover:bg-blue-50
+                          hover:text-blue-600
+                        "
+                        title="Edit task"
+                        aria-label="Edit task"
+                      >
+                        <Pencil size={16} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDelete(task.id)
+                        }
+                        className="
+                          flex
+                          h-9
+                          w-9
+                          items-center
+                          justify-center
+                          rounded-lg
+                          border
+                          border-slate-200
+                          text-slate-500
+                          transition
+                          hover:border-red-200
+                          hover:bg-red-50
+                          hover:text-red-600
+                        "
+                        title="Delete task"
+                        aria-label="Delete task"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+
+                    </div>
+                  )}
 
                 </div>
 
               </div>
 
-            </div>
-
-          ))
-
-        )}
-
-      </div>
-
-
-      {/* =================================================
-          MODAL
-      ================================================= */}
-
-      {showModal && (
-
-        <TaskModal
-          onClose={handleCloseModal}
-          editingTask={editingTask}
-          onAddTask={handleAddTask}
-          onUpdateTask={handleUpdateTask}
-        />
+            </article>
+          );
+        })
 
       )}
 
-    </div>
-  );
+    </section>
+
+
+    {/* MODAL */}
+
+    {showModal && (
+      <TaskModal
+        onClose={handleCloseModal}
+        editingTask={editingTask}
+        onAddTask={handleAddTask}
+        onUpdateTask={handleUpdateTask}
+      />
+    )}
+
+  </div>
+);
 }
 
 export default TasksPage;

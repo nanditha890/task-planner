@@ -19,45 +19,55 @@ import SignupPage from "./pages/SignupPage";
 
 function MainLayout() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* SIDEBAR */}
-
       <Sidebar />
 
       {/* MAIN CONTENT */}
+      <main
+        className="
+          min-h-screen
+          px-4
+          pb-8
+          pt-20
+          sm:px-6
+          lg:ml-64
+          lg:p-8
+        "
+      >
+        <div className="mx-auto w-full max-w-[1600px]">
+          <Routes>
+            <Route
+              path="/"
+              element={<Dashboard />}
+            />
 
-      <main className="ml-64 min-h-screen p-8">
-        <Routes>
-          <Route
-            path="/"
-            element={<Dashboard />}
-          />
+            <Route
+              path="/calendar"
+              element={<CalendarPage />}
+            />
 
-          <Route
-            path="/calendar"
-            element={<CalendarPage />}
-          />
+            <Route
+              path="/tasks"
+              element={<TasksPage />}
+            />
 
-          <Route
-            path="/tasks"
-            element={<TasksPage />}
-          />
+            <Route
+              path="/analytics"
+              element={<AnalyticsPage />}
+            />
 
-          <Route
-            path="/analytics"
-            element={<AnalyticsPage />}
-          />
+            <Route
+              path="/history"
+              element={<HistoryPage />}
+            />
 
-          <Route
-            path="/history"
-            element={<HistoryPage />}
-          />
-
-          <Route
-            path="/settings"
-            element={<SettingsPage />}
-          />
-        </Routes>
+            <Route
+              path="/settings"
+              element={<SettingsPage />}
+            />
+          </Routes>
+        </div>
       </main>
     </div>
   );

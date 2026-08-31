@@ -47,211 +47,454 @@ function AnalyticsPage() {
   // =====================================================
   // UI
   // =====================================================
+return (
+  <div className="space-y-6 sm:space-y-8">
 
-  return (
-    <div className="space-y-8">
+    {/* HEADER */}
 
-      {/* HEADER */}
+    <div>
+      <h1
+        className="
+          text-2xl
+          font-bold
+          tracking-tight
+          text-slate-900
+          sm:text-3xl
+        "
+      >
+        Analytics
+      </h1>
 
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Analytics
-        </h1>
+      <p className="mt-1 text-sm text-slate-500 sm:text-base">
+        Track your productivity and task progress.
+      </p>
+    </div>
 
-        <p className="mt-1 text-gray-500">
-          Track your productivity and task progress.
-        </p>
+
+    {/* STATISTICS */}
+
+    <section
+      className="
+        grid
+        grid-cols-2
+        gap-3
+        lg:grid-cols-4
+        lg:gap-5
+      "
+    >
+
+      {/* TOTAL */}
+
+      <div
+        className="
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          p-4
+          shadow-sm
+          sm:p-5
+        "
+      >
+        <div className="flex items-start justify-between gap-3">
+
+          <div>
+            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+              Total Tasks
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
+              {totalTasks}
+            </p>
+          </div>
+
+          <div
+            className="
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-blue-50
+              text-blue-600
+              sm:h-12
+              sm:w-12
+            "
+          >
+            <ListTodo size={22} />
+          </div>
+
+        </div>
       </div>
 
 
-      {/* STATISTICS */}
+      {/* COMPLETED */}
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+      <div
+        className="
+          rounded-2xl
+          border
+          border-green-100
+          bg-green-50/40
+          p-4
+          shadow-sm
+          sm:p-5
+        "
+      >
+        <div className="flex items-start justify-between gap-3">
 
-        {/* TOTAL */}
+          <div>
+            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+              Completed
+            </p>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <p className="mt-2 text-2xl font-bold text-green-600 sm:text-3xl">
+              {completedTasks}
+            </p>
+          </div>
 
-          <div className="flex items-center justify-between">
-
-            <div>
-              <p className="text-sm text-gray-500">
-                Total Tasks
-              </p>
-
-              <p className="mt-2 text-3xl font-bold text-gray-900">
-                {totalTasks}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
-              <ListTodo size={24} />
-            </div>
-
+          <div
+            className="
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-green-100
+              text-green-600
+              sm:h-12
+              sm:w-12
+            "
+          >
+            <CheckCircle2 size={22} />
           </div>
 
         </div>
-
-
-        {/* COMPLETED */}
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-
-          <div className="flex items-center justify-between">
-
-            <div>
-              <p className="text-sm text-gray-500">
-                Completed
-              </p>
-
-              <p className="mt-2 text-3xl font-bold text-green-600">
-                {completedTasks}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-green-50 p-3 text-green-600">
-              <CheckCircle2 size={24} />
-            </div>
-
-          </div>
-
-        </div>
-
-
-        {/* PENDING */}
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-
-          <div className="flex items-center justify-between">
-
-            <div>
-              <p className="text-sm text-gray-500">
-                Pending
-              </p>
-
-              <p className="mt-2 text-3xl font-bold text-blue-600">
-                {pendingTasks}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
-              <Clock3 size={24} />
-            </div>
-
-          </div>
-
-        </div>
-
-
-        {/* DUE */}
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-
-          <div className="flex items-center justify-between">
-
-            <div>
-              <p className="text-sm text-gray-500">
-                Due
-              </p>
-
-              <p className="mt-2 text-3xl font-bold text-orange-500">
-                {dueTasks}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-orange-50 p-3 text-orange-600">
-              <AlertCircle size={24} />
-            </div>
-
-          </div>
-
-        </div>
-
       </div>
 
 
-      {/* COMPLETION RATE */}
+      {/* PENDING */}
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div
+        className="
+          rounded-2xl
+          border
+          border-blue-100
+          bg-blue-50/40
+          p-4
+          shadow-sm
+          sm:p-5
+        "
+      >
+        <div className="flex items-start justify-between gap-3">
+
+          <div>
+            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+              Pending
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-blue-600 sm:text-3xl">
+              {pendingTasks}
+            </p>
+          </div>
+
+          <div
+            className="
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-blue-100
+              text-blue-600
+              sm:h-12
+              sm:w-12
+            "
+          >
+            <Clock3 size={22} />
+          </div>
+
+        </div>
+      </div>
+
+
+      {/* DUE */}
+
+      <div
+        className="
+          rounded-2xl
+          border
+          border-orange-100
+          bg-orange-50/40
+          p-4
+          shadow-sm
+          sm:p-5
+        "
+      >
+        <div className="flex items-start justify-between gap-3">
+
+          <div>
+            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+              Due
+            </p>
+
+            <p className="mt-2 text-2xl font-bold text-orange-500 sm:text-3xl">
+              {dueTasks}
+            </p>
+          </div>
+
+          <div
+            className="
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-orange-100
+              text-orange-600
+              sm:h-12
+              sm:w-12
+            "
+          >
+            <AlertCircle size={22} />
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+
+    {/* COMPLETION RATE */}
+
+    <section
+      className="
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        p-5
+        shadow-sm
+        sm:p-6
+      "
+    >
+      <div
+        className="
+          flex
+          flex-col
+          gap-4
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+        "
+      >
 
         <div className="flex items-center gap-3">
 
-          <div className="rounded-xl bg-green-50 p-3 text-green-600">
-            <TrendingUp size={24} />
+          <div
+            className="
+              flex
+              h-12
+              w-12
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-green-50
+              text-green-600
+            "
+          >
+            <TrendingUp size={23} />
           </div>
 
           <div>
-
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-slate-900">
               Completion Rate
             </h2>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-500">
               Your overall task completion progress.
             </p>
-
           </div>
 
         </div>
 
 
-        {/* PROGRESS */}
+        {/* BIG PERCENTAGE */}
 
-        <div className="mt-6">
+        <div className="sm:text-right">
 
-          <div className="mb-2 flex justify-between text-sm">
+          <p
+            className="
+              text-3xl
+              font-bold
+              tracking-tight
+              text-green-600
+              sm:text-4xl
+            "
+          >
+            {completionPercentage}%
+          </p>
 
-            <span className="text-gray-500">
-              Progress
-            </span>
-
-            <span className="font-semibold text-gray-900">
-              {completionPercentage}%
-            </span>
-
-          </div>
-
-
-          <div className="h-4 overflow-hidden rounded-full bg-gray-100">
-
-            <div
-              className="h-full rounded-full bg-green-500 transition-all duration-500"
-              style={{
-                width: `${completionPercentage}%`,
-              }}
-            />
-
-          </div>
+          <p className="mt-1 text-xs text-slate-400">
+            Overall progress
+          </p>
 
         </div>
 
       </div>
 
 
-      {/* PRODUCTIVITY MESSAGE */}
+      {/* PROGRESS */}
 
-      <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6">
+      <div className="mt-6">
 
-        <h2 className="text-lg font-semibold text-blue-900">
-          Productivity Overview
-        </h2>
+        <div className="mb-2 flex items-center justify-between text-sm">
 
-        <p className="mt-2 text-sm text-blue-700">
+          <span className="font-medium text-slate-500">
+            Progress
+          </span>
 
-          {totalTasks === 0
-            ? "Start adding tasks to see your productivity analytics."
-            : completionPercentage >= 80
-            ? "Excellent work! You're completing most of your tasks."
-            : completionPercentage >= 50
-            ? "Good progress! Keep working towards completing your tasks."
-            : "You have some pending work. Stay focused and keep going!"}
+          <span className="font-semibold text-slate-900">
+            {completedTasks} of {totalTasks} completed
+          </span>
 
-        </p>
+        </div>
+
+        <div
+          className="
+            h-3
+            overflow-hidden
+            rounded-full
+            bg-slate-100
+            sm:h-4
+          "
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow={completionPercentage}
+          aria-label="Task completion progress"
+        >
+          <div
+            className="
+              h-full
+              rounded-full
+              bg-green-500
+              transition-all
+              duration-500
+            "
+            style={{
+              width: `${completionPercentage}%`,
+            }}
+          />
+        </div>
 
       </div>
+    </section>
 
-    </div>
-  );
-}
+
+    {/* PRODUCTIVITY OVERVIEW */}
+
+    <section
+      className="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-blue-100
+        bg-gradient-to-br
+        from-blue-50
+        to-indigo-50
+        p-5
+        sm:p-6
+      "
+    >
+      <div
+        className="
+          flex
+          flex-col
+          gap-4
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+        "
+      >
+
+        <div className="max-w-2xl">
+
+          <div
+            className="
+              mb-3
+              inline-flex
+              items-center
+              gap-2
+              rounded-full
+              bg-white/70
+              px-3
+              py-1.5
+              text-xs
+              font-semibold
+              text-blue-600
+            "
+          >
+            <TrendingUp size={14} />
+            PRODUCTIVITY
+          </div>
+
+          <h2 className="text-lg font-semibold text-blue-950">
+            Productivity Overview
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-blue-700">
+
+            {totalTasks === 0
+              ? "Start adding tasks to see your productivity analytics."
+              : completionPercentage >= 80
+              ? "Excellent work! You're completing most of your tasks."
+              : completionPercentage >= 50
+              ? "Good progress! Keep working towards completing your tasks."
+              : "You have some pending work. Stay focused and keep going!"}
+
+          </p>
+
+        </div>
+
+
+        {totalTasks > 0 && (
+          <div
+            className="
+              flex
+              h-20
+              w-20
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              border-8
+              border-white/70
+              bg-blue-600
+              text-lg
+              font-bold
+              text-white
+              shadow-sm
+            "
+          >
+            {completionPercentage}%
+          </div>
+        )}
+
+      </div>
+    </section>
+
+  </div>
+);
+      }
 
 export default AnalyticsPage;

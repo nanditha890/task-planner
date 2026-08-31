@@ -114,161 +114,347 @@ function TaskModal({
   ===================================================== */
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div
+    className="
+      fixed
+      inset-0
+      z-50
+      flex
+      items-end
+      justify-center
+      bg-slate-950/50
+      backdrop-blur-[2px]
+      sm:items-center
+      sm:p-4
+    "
+  >
+    {/* MODAL */}
 
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+    <div
+      className="
+        flex
+        max-h-[92vh]
+        w-full
+        flex-col
+        overflow-hidden
+        rounded-t-3xl
+        bg-white
+        shadow-2xl
+        sm:max-w-lg
+        sm:rounded-3xl
+      "
+    >
 
-        {/* =================================================
-            HEADER
-        ================================================= */}
+      {/* ================= HEADER ================= */}
 
-        <div className="mb-6 flex items-center justify-between">
+      <div
+        className="
+          flex
+          shrink-0
+          items-start
+          justify-between
+          gap-4
+          border-b
+          border-slate-100
+          bg-white
+          px-5
+          py-5
+          sm:px-6
+        "
+      >
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">
+            {isEditMode
+              ? "Edit Work"
+              : "Add New Work"}
+          </h2>
 
-          <div>
-
-            <h2 className="text-xl font-bold text-gray-900">
-              {isEditMode
-                ? "Edit Work"
-                : "Add New Work"}
-            </h2>
-
-            <p className="mt-1 text-sm text-gray-500">
-              {isEditMode
-                ? "Update your scheduled work."
-                : "Plan something you want to complete."}
-            </p>
-
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
-          >
-            <X size={20} />
-          </button>
-
+          <p className="mt-1 text-sm text-slate-500">
+            {isEditMode
+              ? "Update your scheduled work."
+              : "Plan something you want to complete."}
+          </p>
         </div>
 
-        {/* =================================================
-            FORM
-        ================================================= */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close modal"
+          className="
+            flex
+            h-10
+            w-10
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-slate-100
+            text-slate-500
+            transition
+            hover:bg-slate-200
+            hover:text-slate-800
+          "
+        >
+          <X size={19} />
+        </button>
+      </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
+
+      {/* ================= FORM ================= */}
+
+      <form
+        onSubmit={handleSubmit}
+        className="
+          flex
+          min-h-0
+          flex-1
+          flex-col
+        "
+      >
+
+        {/* SCROLLABLE FORM CONTENT */}
+
+        <div
+          className="
+            flex-1
+            space-y-5
+            overflow-y-auto
+            px-5
+            py-5
+            sm:px-6
+            sm:py-6
+          "
         >
 
-          {/* =================================================
-              TITLE
-          ================================================= */}
+          {/* TITLE */}
 
           <div>
-
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="task-title"
+              className="
+                mb-2
+                block
+                text-sm
+                font-semibold
+                text-slate-700
+              "
+            >
               Work title
             </label>
 
             <input
+              id="task-title"
               type="text"
               value={title}
               onChange={(event) =>
                 setTitle(event.target.value)
               }
               placeholder="Example: Complete project report"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50/50
+                px-4
+                py-3
+                text-sm
+                text-slate-900
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-blue-400
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-50
+              "
               required
             />
-
           </div>
 
-          {/* =================================================
-              DESCRIPTION
-          ================================================= */}
+
+          {/* DESCRIPTION */}
 
           <div>
-
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="task-description"
+              className="
+                mb-2
+                block
+                text-sm
+                font-semibold
+                text-slate-700
+              "
+            >
               Description
             </label>
 
             <textarea
+              id="task-description"
               value={description}
               onChange={(event) =>
                 setDescription(event.target.value)
               }
               placeholder="Add some details about this work..."
               rows="3"
-              className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="
+                w-full
+                resize-none
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50/50
+                px-4
+                py-3
+                text-sm
+                text-slate-900
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-blue-400
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-50
+              "
             />
-
           </div>
 
-          {/* =================================================
-              DATE + TIME
-          ================================================= */}
+
+          {/* DATE + TIME */}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
             {/* DATE */}
 
             <div>
-
-              <label className="mb-2 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="task-date"
+                className="
+                  mb-2
+                  block
+                  text-sm
+                  font-semibold
+                  text-slate-700
+                "
+              >
                 Date
               </label>
 
               <input
+                id="task-date"
                 type="date"
                 value={date}
                 onChange={(event) =>
                   setDate(event.target.value)
                 }
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  bg-slate-50/50
+                  px-4
+                  py-3
+                  text-sm
+                  text-slate-900
+                  outline-none
+                  transition
+                  focus:border-blue-400
+                  focus:bg-white
+                  focus:ring-4
+                  focus:ring-blue-50
+                "
                 required
               />
-
             </div>
+
 
             {/* TIME */}
 
             <div>
-
-              <label className="mb-2 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="task-time"
+                className="
+                  mb-2
+                  block
+                  text-sm
+                  font-semibold
+                  text-slate-700
+                "
+              >
                 Time
               </label>
 
               <input
+                id="task-time"
                 type="time"
                 value={time}
                 onChange={(event) =>
                   setTime(event.target.value)
                 }
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  bg-slate-50/50
+                  px-4
+                  py-3
+                  text-sm
+                  text-slate-900
+                  outline-none
+                  transition
+                  focus:border-blue-400
+                  focus:bg-white
+                  focus:ring-4
+                  focus:ring-blue-50
+                "
               />
-
             </div>
 
           </div>
 
-          {/* =================================================
-              PRIORITY
-          ================================================= */}
+
+          {/* PRIORITY */}
 
           <div>
-
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="task-priority"
+              className="
+                mb-2
+                block
+                text-sm
+                font-semibold
+                text-slate-700
+              "
+            >
               Priority
             </label>
 
             <select
+              id="task-priority"
               value={priority}
               onChange={(event) =>
                 setPriority(event.target.value)
               }
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50/50
+                px-4
+                py-3
+                text-sm
+                text-slate-900
+                outline-none
+                transition
+                focus:border-blue-400
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-50
+              "
             >
-
               <option value="High">
                 🔴 High
               </option>
@@ -280,29 +466,50 @@ function TaskModal({
               <option value="Low">
                 🟢 Low
               </option>
-
             </select>
-
           </div>
 
-          {/* =================================================
-              REMINDER
-          ================================================= */}
+
+          {/* REMINDER */}
 
           <div>
-
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="task-reminder"
+              className="
+                mb-2
+                block
+                text-sm
+                font-semibold
+                text-slate-700
+              "
+            >
               Reminder
             </label>
 
             <select
+              id="task-reminder"
               value={reminder}
               onChange={(event) =>
                 setReminder(event.target.value)
               }
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50/50
+                px-4
+                py-3
+                text-sm
+                text-slate-900
+                outline-none
+                transition
+                focus:border-blue-400
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-50
+              "
             >
-
               <option value="0">
                 At the scheduled time
               </option>
@@ -326,29 +533,50 @@ function TaskModal({
               <option value="1440">
                 1 day before
               </option>
-
             </select>
-
           </div>
 
-          {/* =================================================
-              REPEAT
-          ================================================= */}
+
+          {/* REPEAT */}
 
           <div>
-
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="task-repeat"
+              className="
+                mb-2
+                block
+                text-sm
+                font-semibold
+                text-slate-700
+              "
+            >
               Repeat
             </label>
 
             <select
+              id="task-repeat"
               value={repeat}
               onChange={(event) =>
                 setRepeat(event.target.value)
               }
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50/50
+                px-4
+                py-3
+                text-sm
+                text-slate-900
+                outline-none
+                transition
+                focus:border-blue-400
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-50
+              "
             >
-
               <option value="Never">
                 Never
               </option>
@@ -364,42 +592,73 @@ function TaskModal({
               <option value="Monthly">
                 Every month
               </option>
-
             </select>
-
           </div>
 
-          {/* =================================================
-              BUTTONS
-          ================================================= */}
+        </div>
 
-          <div className="flex gap-3 pt-2">
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 rounded-xl border border-gray-200 px-4 py-3 font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
+        {/* ================= BUTTONS ================= */}
 
-            <button
-              type="submit"
-              className="flex-1 rounded-xl bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700"
-            >
-              {isEditMode
-                ? "Save Changes"
-                : "Add Work"}
-            </button>
+        <div
+          className="
+            grid
+            shrink-0
+            grid-cols-2
+            gap-3
+            border-t
+            border-slate-100
+            bg-white
+            px-5
+            py-4
+            sm:px-6
+          "
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            className="
+              rounded-xl
+              border
+              border-slate-200
+              px-4
+              py-3
+              text-sm
+              font-semibold
+              text-slate-700
+              transition
+              hover:bg-slate-50
+            "
+          >
+            Cancel
+          </button>
 
-          </div>
+          <button
+            type="submit"
+            className="
+              rounded-xl
+              bg-blue-600
+              px-4
+              py-3
+              text-sm
+              font-semibold
+              text-white
+              shadow-sm
+              transition
+              hover:bg-blue-700
+            "
+          >
+            {isEditMode
+              ? "Save Changes"
+              : "Add Work"}
+          </button>
+        </div>
 
-        </form>
-
-      </div>
+      </form>
 
     </div>
-  );
+  </div>
+);
 }
 
 export default TaskModal;

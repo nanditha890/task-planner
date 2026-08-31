@@ -122,83 +122,354 @@ function CalendarPage() {
   }
 
   return (
-    <div className="space-y-6">
+  <div className="space-y-6">
 
-      {/* ================= HEADER ================= */}
+    {/* ================= HEADER ================= */}
 
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+    <div
+      className="
+        flex
+        flex-col
+        gap-4
+        sm:flex-row
+        sm:items-center
+        sm:justify-between
+      "
+    >
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+          Calendar
+        </h1>
 
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Calendar
-          </h1>
+        <p className="mt-1 text-sm text-slate-500 sm:text-base">
+          View and manage your scheduled work.
+        </p>
+      </div>
 
-          <p className="mt-1 text-gray-500">
-            View and manage your scheduled work.
-          </p>
+      <button
+        onClick={() => {
+          setSelectedDate(null);
+          setShowModal(true);
+        }}
+        className="
+          flex
+          w-full
+          items-center
+          justify-center
+          gap-2
+          rounded-xl
+          bg-blue-600
+          px-5
+          py-3
+          text-sm
+          font-semibold
+          text-white
+          shadow-sm
+          transition
+          hover:bg-blue-700
+          sm:w-auto
+        "
+      >
+        <Plus size={18} />
+        Add Work
+      </button>
+    </div>
+
+
+    {/* ================= CALENDAR CARD ================= */}
+
+    <section
+      className="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        shadow-sm
+      "
+    >
+
+      {/* CALENDAR HEADER */}
+
+      <div
+        className="
+          flex
+          flex-col
+          gap-4
+          border-b
+          border-slate-200
+          p-4
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+          sm:p-5
+        "
+      >
+        <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
+          {monthName}
+        </h2>
+
+        <div className="flex items-center gap-2">
+
+          <button
+            onClick={goToToday}
+            className="
+              rounded-lg
+              border
+              border-slate-200
+              px-4
+              py-2
+              text-sm
+              font-medium
+              text-slate-700
+              transition
+              hover:bg-slate-50
+            "
+          >
+            Today
+          </button>
+
+          <button
+            onClick={goToPreviousMonth}
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-lg
+              border
+              border-slate-200
+              text-slate-600
+              transition
+              hover:bg-slate-50
+            "
+            aria-label="Previous month"
+          >
+            <ChevronLeft size={18} />
+          </button>
+
+          <button
+            onClick={goToNextMonth}
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-lg
+              border
+              border-slate-200
+              text-slate-600
+              transition
+              hover:bg-slate-50
+            "
+            aria-label="Next month"
+          >
+            <ChevronRight size={18} />
+          </button>
+
         </div>
-
-        {/* ADD WORK BUTTON */}
-
-        <button
-          onClick={() => {
-            setSelectedDate(null);
-            setShowModal(true);
-          }}
-          className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-medium text-white shadow-sm hover:bg-blue-700"
-        >
-          <Plus size={18} />
-
-          Add Work
-        </button>
-
       </div>
 
 
-      {/* ================= CALENDAR ================= */}
+      {/* =================================================
+          MOBILE VIEW
+      ================================================= */}
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="block p-4 md:hidden">
 
-        {/* CALENDAR HEADER */}
+        <div className="space-y-3">
 
-        <div className="flex items-center justify-between border-b border-gray-200 p-5">
+          {calendarDays
+            .filter((day) => day !== null)
+            .map((day) => {
 
-          <h2 className="text-xl font-semibold text-gray-900">
-            {monthName}
-          </h2>
+              const dayTasks = getTasksForDay(day);
 
-          <div className="flex items-center gap-2">
+              const fullDate = new Date(
+                year,
+                month,
+                day
+              ).toLocaleDateString("en-IN", {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+              });
 
-            <button
-              onClick={goToToday}
-              className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Today
-            </button>
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() =>
+                    handleDateClick(day)
+                  }
+                  className={`
+                    w-full
+                    rounded-2xl
+                    border
+                    p-4
+                    text-left
+                    transition
 
-            <button
-              onClick={goToPreviousMonth}
-              className="rounded-lg border border-gray-200 p-2 text-gray-600 hover:bg-gray-50"
-            >
-              <ChevronLeft size={18} />
-            </button>
+                    ${
+                      isToday(day)
+                        ? "border-blue-200 bg-blue-50/60"
+                        : "border-slate-200 bg-white hover:bg-slate-50"
+                    }
+                  `}
+                >
+                  <div
+                    className="
+                      flex
+                      items-start
+                      justify-between
+                      gap-3
+                    "
+                  >
 
-            <button
-              onClick={goToNextMonth}
-              className="rounded-lg border border-gray-200 p-2 text-gray-600 hover:bg-gray-50"
-            >
-              <ChevronRight size={18} />
-            </button>
+                    <div>
+                      <div className="flex items-center gap-2">
 
-          </div>
+                        <span
+                          className={`
+                            flex
+                            h-9
+                            w-9
+                            items-center
+                            justify-center
+                            rounded-xl
+                            text-sm
+                            font-bold
+
+                            ${
+                              isToday(day)
+                                ? "bg-blue-600 text-white"
+                                : "bg-slate-100 text-slate-700"
+                            }
+                          `}
+                        >
+                          {day}
+                        </span>
+
+                        <div>
+                          <p className="text-sm font-semibold text-slate-800">
+                            {fullDate}
+                          </p>
+
+                          <p className="text-xs text-slate-400">
+                            {dayTasks.length}{" "}
+                            {dayTasks.length === 1
+                              ? "task"
+                              : "tasks"}
+                          </p>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    {isToday(day) && (
+                      <span
+                        className="
+                          rounded-full
+                          bg-blue-100
+                          px-2.5
+                          py-1
+                          text-[11px]
+                          font-semibold
+                          text-blue-600
+                        "
+                      >
+                        TODAY
+                      </span>
+                    )}
+
+                  </div>
+
+
+                  {dayTasks.length > 0 && (
+                    <div className="mt-3 space-y-2">
+
+                      {dayTasks.slice(0, 3).map((task) => (
+
+                        <div
+                          key={task.id}
+                          onClick={(event) =>
+                            event.stopPropagation()
+                          }
+                          className={`
+                            rounded-xl
+                            px-3
+                            py-2
+                            text-xs
+
+                            ${
+                              task.completed
+                                ? "bg-green-50 text-green-700"
+                                : task.status === "due"
+                                ? "bg-orange-50 text-orange-700"
+                                : task.priority === "High"
+                                ? "bg-red-50 text-red-700"
+                                : task.priority === "Medium"
+                                ? "bg-yellow-50 text-yellow-700"
+                                : "bg-blue-50 text-blue-700"
+                            }
+                          `}
+                        >
+                          <div className="font-medium">
+                            {task.completed && "✓ "}
+
+                            {task.status === "due" &&
+                              !task.completed &&
+                              "DUE: "}
+
+                            {task.title}
+                          </div>
+
+                          {task.time &&
+                            task.time !== "No time set" && (
+                              <div className="mt-0.5 opacity-70">
+                                {task.time}
+                              </div>
+                            )}
+                        </div>
+
+                      ))}
+
+                      {dayTasks.length > 3 && (
+                        <p className="text-xs font-medium text-slate-400">
+                          +{dayTasks.length - 3} more
+                        </p>
+                      )}
+
+                    </div>
+                  )}
+
+                </button>
+              );
+            })}
 
         </div>
+      </div>
 
 
-        {/* ================= WEEK DAYS ================= */}
+      {/* =================================================
+          DESKTOP / TABLET CALENDAR
+      ================================================= */}
 
-        <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+      <div className="hidden md:block">
 
+        {/* WEEK DAYS */}
+
+        <div
+          className="
+            grid
+            grid-cols-7
+            border-b
+            border-slate-200
+            bg-slate-50
+          "
+        >
           {[
             "Sun",
             "Mon",
@@ -211,17 +482,24 @@ function CalendarPage() {
 
             <div
               key={day}
-              className="p-3 text-center text-xs font-semibold uppercase text-gray-500"
+              className="
+                p-3
+                text-center
+                text-xs
+                font-semibold
+                uppercase
+                tracking-wide
+                text-slate-500
+              "
             >
               {day}
             </div>
 
           ))}
-
         </div>
 
 
-        {/* ================= CALENDAR DAYS ================= */}
+        {/* CALENDAR DAYS */}
 
         <div className="grid grid-cols-7">
 
@@ -230,32 +508,57 @@ function CalendarPage() {
             const dayTasks = getTasksForDay(day);
 
             return (
-
               <div
                 key={index}
+                onClick={() =>
+                  handleDateClick(day)
+                }
+                className={`
+                  min-h-[130px]
+                  border-b
+                  border-r
+                  border-slate-100
+                  p-2
+                  transition
 
-                onClick={() => handleDateClick(day)}
+                  ${
+                    day
+                      ? "cursor-pointer hover:bg-blue-50/50"
+                      : "bg-slate-50/30"
+                  }
 
-                className={`min-h-[130px] border-b border-r border-gray-100 p-2 transition ${
-                  day
-                    ? "cursor-pointer hover:bg-blue-50/50"
-                    : "bg-gray-50/30"
-                }`}
+                  ${
+                    isToday(day)
+                      ? "bg-blue-50/20"
+                      : ""
+                  }
+                `}
               >
 
                 {day && (
                   <>
 
-                    {/* DATE NUMBER */}
+                    {/* DATE */}
 
                     <div className="mb-2 flex justify-end">
 
                       <span
-                        className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium ${
-                          isToday(day)
-                            ? "bg-blue-600 text-white"
-                            : "text-gray-700"
-                        }`}
+                        className={`
+                          flex
+                          h-8
+                          w-8
+                          items-center
+                          justify-center
+                          rounded-full
+                          text-sm
+                          font-medium
+
+                          ${
+                            isToday(day)
+                              ? "bg-blue-600 text-white shadow-sm"
+                              : "text-slate-700"
+                          }
+                        `}
                       >
                         {day}
                       </span>
@@ -267,26 +570,31 @@ function CalendarPage() {
 
                     <div className="space-y-1">
 
-                      {dayTasks.map((task) => (
+                      {dayTasks.slice(0, 3).map((task) => (
 
                         <div
                           key={task.id}
                           onClick={(event) => {
-                            // Don't open Add Work
-                            // when clicking existing task
                             event.stopPropagation();
                           }}
-                          className={`rounded-lg px-2 py-1.5 text-xs ${
-                            task.completed
-                              ? "bg-green-50 text-green-700"
-                              : task.status === "due"
-                              ? "bg-orange-50 text-orange-700"
-                              : task.priority === "High"
-                              ? "bg-red-50 text-red-700"
-                              : task.priority === "Medium"
-                              ? "bg-yellow-50 text-yellow-700"
-                              : "bg-blue-50 text-blue-700"
-                          }`}
+                          className={`
+                            rounded-lg
+                            px-2
+                            py-1.5
+                            text-xs
+
+                            ${
+                              task.completed
+                                ? "bg-green-50 text-green-700"
+                                : task.status === "due"
+                                ? "bg-orange-50 text-orange-700"
+                                : task.priority === "High"
+                                ? "bg-red-50 text-red-700"
+                                : task.priority === "Medium"
+                                ? "bg-yellow-50 text-yellow-700"
+                                : "bg-blue-50 text-blue-700"
+                            }
+                          `}
                         >
 
                           <div className="truncate font-medium">
@@ -303,62 +611,68 @@ function CalendarPage() {
 
                           {task.time &&
                             task.time !== "No time set" && (
-
-                            <div className="mt-0.5 opacity-70">
-                              {task.time}
-                            </div>
-
-                          )}
+                              <div className="mt-0.5 opacity-70">
+                                {task.time}
+                              </div>
+                            )}
 
                         </div>
 
                       ))}
 
+
+                      {dayTasks.length > 3 && (
+                        <div
+                          className="
+                            px-1
+                            pt-1
+                            text-[11px]
+                            font-medium
+                            text-slate-400
+                          "
+                        >
+                          +{dayTasks.length - 3} more
+                        </div>
+                      )}
+
                     </div>
 
                   </>
-
                 )}
 
               </div>
-
             );
-
           })}
 
         </div>
 
       </div>
 
+    </section>
 
-      {/* ================= ADD WORK MODAL ================= */}
 
-      {showModal && (
+    {/* ================= ADD WORK MODAL ================= */}
 
-        <TaskModal
+    {showModal && (
 
-          selectedDate={selectedDate}
+      <TaskModal
+        selectedDate={selectedDate}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedDate(null);
+        }}
+        onAddTask={(newTask) => {
+          addTask(newTask);
 
-          onClose={() => {
-            setShowModal(false);
-            setSelectedDate(null);
-          }}
+          setShowModal(false);
+          setSelectedDate(null);
+        }}
+      />
 
-          onAddTask={(newTask) => {
+    )}
 
-            addTask(newTask);
-
-            setShowModal(false);
-            setSelectedDate(null);
-
-          }}
-
-        />
-
-      )}
-
-    </div>
-  );
+  </div>
+);
 }
 
 export default CalendarPage;

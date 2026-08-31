@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+@media (pointer: fine) {
+  html,
+  body {
+    cursor: default;
+  }
+
+  button,
+  a,
+  [role="button"],
+  select {
+    cursor: pointer;
+  }
+
+  input,
+  textarea {
+    cursor: text;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="date"],
+  input[type="time"] {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
