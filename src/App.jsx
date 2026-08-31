@@ -19,7 +19,7 @@ import SignupPage from "./pages/SignupPage";
 
 function MainLayout() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 transition-colors duration-200 dark:bg-slate-950">
       {/* SIDEBAR */}
       <Sidebar />
 

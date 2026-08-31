@@ -63,7 +63,7 @@ function SettingsPage() {
         const { data: profile, error: profileError } =
           await supabase
             .from("profiles")
-            .select("id, full_name")
+            .select("id, full_name, notifications, email_notifications, dark_mode")
             .eq("id", user.id)
             .single();
 
@@ -81,10 +81,21 @@ function SettingsPage() {
           setEmail(user.email || "");
 
         } else {
-          setName(profile?.full_name || "");
-          setEmail(user.email || "");
-        }
+  setName(profile?.full_name || "");
+  setEmail(user.email || "");
 
+  setNotifications(
+    profile?.notifications ?? true
+  );
+
+  setEmailNotifications(
+    profile?.email_notifications ?? true
+  );
+
+  setDarkMode(
+    profile?.dark_mode ?? false
+  );
+}
         // -----------------------------------------------
         // LOAD LOCAL SETTINGS
         // -----------------------------------------------

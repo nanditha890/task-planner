@@ -59,367 +59,435 @@ function HistoryPage() {
   // UI
   // =====================================================
 
-return (
-  <div className="space-y-6 sm:space-y-8">
+  return (
+    <div className="space-y-6 sm:space-y-8">
+      {/* HEADER */}
 
-    {/* HEADER */}
+      <div>
+        <h1
+          className="
+            text-2xl
+            font-bold
+            tracking-tight
+            text-slate-900
+            dark:text-white
+            sm:text-3xl
+          "
+        >
+          History
+        </h1>
 
-    <div>
-      <h1
+        <p
+          className="
+            mt-1
+            text-sm
+            text-slate-500
+            dark:text-slate-400
+            sm:text-base
+          "
+        >
+          View your completed tasks.
+        </p>
+      </div>
+
+      {/* SUMMARY */}
+
+      <section
         className="
-          text-2xl
-          font-bold
-          tracking-tight
-          text-slate-900
-          sm:text-3xl
+          rounded-2xl
+          border
+          border-green-100
+          bg-green-50/40
+          p-5
+          shadow-sm
+          transition-colors
+          dark:border-green-900/50
+          dark:bg-green-950/20
+          sm:p-6
         "
       >
-        History
-      </h1>
-
-      <p className="mt-1 text-sm text-slate-500 sm:text-base">
-        View your completed tasks.
-      </p>
-    </div>
-
-
-    {/* SUMMARY */}
-
-    <section
-      className="
-        rounded-2xl
-        border
-        border-green-100
-        bg-green-50/40
-        p-5
-        shadow-sm
-        sm:p-6
-      "
-    >
-      <div className="flex items-center justify-between gap-4">
-
-        <div>
-          <p className="text-sm font-medium text-slate-500">
-            Completed Tasks
-          </p>
-
-          <p className="mt-2 text-3xl font-bold text-green-600">
-            {completedTasks.length}
-          </p>
-        </div>
-
-        <div
-          className="
-            flex
-            h-12
-            w-12
-            shrink-0
-            items-center
-            justify-center
-            rounded-xl
-            bg-green-100
-            text-green-600
-          "
-        >
-          <CheckCircle2 size={24} />
-        </div>
-
-      </div>
-    </section>
-
-
-    {/* HISTORY LIST */}
-
-    <section className="space-y-3 sm:space-y-4">
-
-      {completedTasks.length === 0 ? (
-
-        /* EMPTY STATE */
-
-        <div
-          className="
-            rounded-2xl
-            border
-            border-dashed
-            border-slate-300
-            bg-white
-            px-5
-            py-10
-            text-center
-            shadow-sm
-          "
-        >
-          <div
-            className="
-              mx-auto
-              flex
-              h-16
-              w-16
-              items-center
-              justify-center
-              rounded-2xl
-              bg-slate-50
-            "
-          >
-            <CheckCircle2
-              size={30}
-              className="text-slate-300"
-            />
-          </div>
-
-          <h2 className="mt-4 text-lg font-semibold text-slate-700">
-            No completed tasks
-          </h2>
-
-          <p className="mt-1 text-sm text-slate-400">
-            Completed tasks will appear here.
-          </p>
-        </div>
-
-      ) : (
-
-        completedTasks
-          .slice()
-          .reverse()
-          .map((task) => (
-
-            <article
-              key={task.id}
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p
               className="
-                rounded-2xl
-                border
-                border-green-100
-                bg-white
-                p-4
-                shadow-sm
-                transition
-                hover:shadow-md
-                sm:p-5
+                text-sm
+                font-medium
+                text-slate-500
+                dark:text-slate-400
               "
             >
-              <div
+              Completed Tasks
+            </p>
+
+            <p
+              className="
+                mt-2
+                text-3xl
+                font-bold
+                text-green-600
+                dark:text-green-400
+              "
+            >
+              {completedTasks.length}
+            </p>
+          </div>
+
+          <div
+            className="
+              flex
+              h-12
+              w-12
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-green-100
+              text-green-600
+              dark:bg-green-950/60
+              dark:text-green-400
+            "
+          >
+            <CheckCircle2 size={24} />
+          </div>
+        </div>
+      </section>
+
+      {/* HISTORY LIST */}
+
+      <section className="space-y-3 sm:space-y-4">
+        {completedTasks.length === 0 ? (
+          /* EMPTY STATE */
+
+          <div
+            className="
+              rounded-2xl
+              border
+              border-dashed
+              border-slate-300
+              bg-white
+              px-5
+              py-10
+              text-center
+              shadow-sm
+              transition-colors
+              dark:border-slate-700
+              dark:bg-slate-900
+            "
+          >
+            <div
+              className="
+                mx-auto
+                flex
+                h-16
+                w-16
+                items-center
+                justify-center
+                rounded-2xl
+                bg-slate-50
+                dark:bg-slate-800
+              "
+            >
+              <CheckCircle2
+                size={30}
                 className="
-                  flex
-                  flex-col
-                  gap-4
-                  sm:flex-row
-                  sm:items-start
-                  sm:justify-between
+                  text-slate-300
+                  dark:text-slate-600
+                "
+              />
+            </div>
+
+            <h2
+              className="
+                mt-4
+                text-lg
+                font-semibold
+                text-slate-700
+                dark:text-slate-200
+              "
+            >
+              No completed tasks
+            </h2>
+
+            <p
+              className="
+                mt-1
+                text-sm
+                text-slate-400
+                dark:text-slate-500
+              "
+            >
+              Completed tasks will appear here.
+            </p>
+          </div>
+        ) : (
+          completedTasks
+            .slice()
+            .reverse()
+            .map((task) => (
+              <article
+                key={task.id}
+                className="
+                  rounded-2xl
+                  border
+                  border-green-100
+                  bg-white
+                  p-4
+                  shadow-sm
+                  transition
+                  hover:shadow-md
+                  dark:border-green-900/40
+                  dark:bg-slate-900
+                  dark:hover:border-green-800/60
+                  dark:hover:shadow-none
+                  sm:p-5
                 "
               >
+                <div
+                  className="
+                    flex
+                    flex-col
+                    gap-4
+                    sm:flex-row
+                    sm:items-start
+                    sm:justify-between
+                  "
+                >
+                  {/* LEFT */}
 
-                {/* LEFT */}
-
-                <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
-
-                  {/* CHECK ICON */}
-
-                  <div
-                    className="
-                      flex
-                      h-10
-                      w-10
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-full
-                      bg-green-500
-                      text-white
-                      shadow-sm
-                    "
-                  >
-                    <CheckCircle2 size={20} />
-                  </div>
-
-
-                  {/* TASK INFORMATION */}
-
-                  <div className="min-w-0 flex-1">
+                  <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
+                    {/* CHECK ICON */}
 
                     <div
                       className="
                         flex
-                        flex-wrap
-                        items-start
-                        justify-between
-                        gap-2
+                        h-10
+                        w-10
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-full
+                        bg-green-500
+                        text-white
+                        shadow-sm
+                        dark:shadow-none
                       "
                     >
-                      <h3
+                      <CheckCircle2 size={20} />
+                    </div>
+
+                    {/* TASK INFORMATION */}
+
+                    <div className="min-w-0 flex-1">
+                      <div
                         className="
-                          break-words
-                          font-semibold
-                          text-slate-900
+                          flex
+                          flex-wrap
+                          items-start
+                          justify-between
+                          gap-2
                         "
                       >
-                        {task.title}
-                      </h3>
+                        <h3
+                          className="
+                            break-words
+                            font-semibold
+                            text-slate-900
+                            dark:text-slate-100
+                          "
+                        >
+                          {task.title}
+                        </h3>
 
-                      <span
+                        <span
+                          className="
+                            rounded-full
+                            bg-green-50
+                            px-3
+                            py-1
+                            text-[11px]
+                            font-semibold
+                            text-green-600
+                            dark:bg-green-950/50
+                            dark:text-green-400
+                            sm:hidden
+                          "
+                        >
+                          COMPLETED
+                        </span>
+                      </div>
+
+                      {/* DESCRIPTION */}
+
+                      {task.description && (
+                        <p
+                          className="
+                            mt-1
+                            break-words
+                            text-sm
+                            leading-6
+                            text-slate-500
+                            dark:text-slate-400
+                          "
+                        >
+                          {task.description}
+                        </p>
+                      )}
+
+                      {/* ORIGINAL DATE + TIME */}
+
+                      <div
                         className="
-                          rounded-full
-                          bg-green-50
+                          mt-3
+                          flex
+                          flex-wrap
+                          items-center
+                          gap-x-4
+                          gap-y-2
+                          text-xs
+                          text-slate-500
+                          dark:text-slate-400
+                        "
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <CalendarDays size={14} />
+                          {formatDate(task.date)}
+                        </span>
+
+                        <span className="flex items-center gap-1.5">
+                          <Clock3 size={14} />
+                          {task.time || "No time set"}
+                        </span>
+                      </div>
+
+                      {/* COMPLETED BY */}
+
+                      <div
+                        className="
+                          mt-3
+                          flex
+                          items-start
+                          gap-1.5
+                          text-xs
+                          text-slate-500
+                          dark:text-slate-400
+                        "
+                      >
+                        <User
+                          size={14}
+                          className="mt-0.5 shrink-0"
+                        />
+
+                        <span>
+                          Completed by{" "}
+                          <span
+                            className="
+                              font-medium
+                              text-slate-700
+                              dark:text-slate-200
+                            "
+                          >
+                            {getCompletedByName(task)}
+                          </span>
+                        </span>
+                      </div>
+
+                      {/* MOBILE COMPLETED DATE */}
+
+                      <div
+                        className="
+                          mt-3
+                          rounded-xl
+                          bg-slate-50
                           px-3
-                          py-1
-                          text-[11px]
-                          font-semibold
-                          text-green-600
+                          py-2
+                          dark:bg-slate-800
                           sm:hidden
                         "
                       >
-                        COMPLETED
-                      </span>
+                        <p
+                          className="
+                            text-[11px]
+                            text-slate-400
+                            dark:text-slate-500
+                          "
+                        >
+                          Completed on
+                        </p>
+
+                        <p
+                          className="
+                            mt-0.5
+                            text-xs
+                            font-medium
+                            text-slate-600
+                            dark:text-slate-300
+                          "
+                        >
+                          {formatCompletedAt(task.completedAt)}
+                        </p>
+                      </div>
                     </div>
+                  </div>
 
+                  {/* RIGHT - DESKTOP */}
 
-                    {/* DESCRIPTION */}
-
-                    {task.description && (
-                      <p
-                        className="
-                          mt-1
-                          break-words
-                          text-sm
-                          leading-6
-                          text-slate-500
-                        "
-                      >
-                        {task.description}
-                      </p>
-                    )}
-
-
-                    {/* ORIGINAL DATE + TIME */}
-
-                    <div
+                  <div
+                    className="
+                      hidden
+                      shrink-0
+                      text-right
+                      sm:block
+                    "
+                  >
+                    <span
                       className="
-                        mt-3
-                        flex
-                        flex-wrap
-                        items-center
-                        gap-x-4
-                        gap-y-2
-                        text-xs
-                        text-slate-500
-                      "
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <CalendarDays size={14} />
-                        {formatDate(task.date)}
-                      </span>
-
-                      <span className="flex items-center gap-1.5">
-                        <Clock3 size={14} />
-                        {task.time || "No time set"}
-                      </span>
-                    </div>
-
-
-                    {/* COMPLETED BY */}
-
-                    <div
-                      className="
-                        mt-3
-                        flex
-                        items-start
-                        gap-1.5
-                        text-xs
-                        text-slate-500
-                      "
-                    >
-                      <User
-                        size={14}
-                        className="mt-0.5 shrink-0"
-                      />
-
-                      <span>
-                        Completed by{" "}
-                        <span className="font-medium text-slate-700">
-                          {getCompletedByName(task)}
-                        </span>
-                      </span>
-                    </div>
-
-
-                    {/* MOBILE COMPLETED DATE */}
-
-                    <div
-                      className="
-                        mt-3
-                        rounded-xl
-                        bg-slate-50
+                        inline-flex
+                        rounded-full
+                        bg-green-50
                         px-3
-                        py-2
-                        sm:hidden
+                        py-1
+                        text-xs
+                        font-medium
+                        text-green-600
+                        dark:bg-green-950/50
+                        dark:text-green-400
                       "
                     >
-                      <p className="text-[11px] text-slate-400">
-                        Completed on
-                      </p>
+                      COMPLETED
+                    </span>
 
-                      <p className="mt-0.5 text-xs font-medium text-slate-600">
-                        {formatCompletedAt(task.completedAt)}
-                      </p>
-                    </div>
+                    <p
+                      className="
+                        mt-3
+                        text-xs
+                        text-slate-400
+                        dark:text-slate-500
+                      "
+                    >
+                      Completed on
+                    </p>
 
+                    <p
+                      className="
+                        mt-0.5
+                        max-w-[170px]
+                        text-xs
+                        font-medium
+                        leading-5
+                        text-slate-600
+                        dark:text-slate-300
+                      "
+                    >
+                      {formatCompletedAt(task.completedAt)}
+                    </p>
                   </div>
                 </div>
-
-
-                {/* RIGHT - DESKTOP */}
-
-                <div
-                  className="
-                    hidden
-                    shrink-0
-                    text-right
-                    sm:block
-                  "
-                >
-                  <span
-                    className="
-                      inline-flex
-                      rounded-full
-                      bg-green-50
-                      px-3
-                      py-1
-                      text-xs
-                      font-medium
-                      text-green-600
-                    "
-                  >
-                    COMPLETED
-                  </span>
-
-                  <p className="mt-3 text-xs text-slate-400">
-                    Completed on
-                  </p>
-
-                  <p
-                    className="
-                      mt-0.5
-                      max-w-[170px]
-                      text-xs
-                      font-medium
-                      leading-5
-                      text-slate-600
-                    "
-                  >
-                    {formatCompletedAt(task.completedAt)}
-                  </p>
-                </div>
-
-              </div>
-            </article>
-
-          ))
-
-      )}
-
-    </section>
-
-  </div>
-);
+              </article>
+            ))
+        )}
+      </section>
+    </div>
+  );
 }
 
 export default HistoryPage;

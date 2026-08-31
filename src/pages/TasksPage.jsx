@@ -237,13 +237,14 @@ const dueCount = tasks.filter(
             font-bold
             tracking-tight
             text-slate-900
+dark:text-white
             sm:text-3xl
           "
         >
           Tasks
         </h1>
 
-        <p className="mt-1 text-sm text-slate-500 sm:text-base">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 sm:text-base">
           Manage all your scheduled work in one place.
         </p>
       </div>
@@ -283,7 +284,9 @@ const dueCount = tasks.filter(
         rounded-2xl
         border
         border-slate-200
-        bg-white
+bg-white
+dark:border-slate-700
+dark:bg-slate-900
         p-4
         shadow-sm
         sm:p-5
@@ -328,6 +331,13 @@ const dueCount = tasks.filter(
             focus:bg-white
             focus:ring-4
             focus:ring-blue-50
+            dark:border-slate-700
+dark:bg-slate-800
+dark:text-white
+dark:placeholder:text-slate-500
+dark:focus:border-blue-500
+dark:focus:bg-slate-800
+dark:focus:ring-blue-950
           "
         />
       </div>
@@ -359,7 +369,7 @@ const dueCount = tasks.filter(
             ${
               filter === "all"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             }
           `}
         >
@@ -381,7 +391,7 @@ const dueCount = tasks.filter(
             ${
               filter === "pending"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             }
           `}
         >
@@ -403,7 +413,7 @@ const dueCount = tasks.filter(
             ${
               filter === "due"
                 ? "bg-orange-500 text-white shadow-sm"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             }
           `}
         >
@@ -425,7 +435,7 @@ const dueCount = tasks.filter(
             ${
               filter === "completed"
                 ? "bg-green-600 text-white shadow-sm"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             }
           `}
         >
@@ -457,13 +467,15 @@ const dueCount = tasks.filter(
           p-4
           shadow-sm
           sm:p-5
+          dark:border-slate-700
+dark:bg-slate-900
         "
       >
-        <p className="text-xs font-medium text-slate-500 sm:text-sm">
+        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 sm:text-sm">
           Total
         </p>
 
-        <p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
+        <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
           {totalCount}
         </p>
       </div>
@@ -479,11 +491,13 @@ const dueCount = tasks.filter(
           p-4
           shadow-sm
           sm:p-5
+          dark:border-blue-900/50
+dark:bg-blue-950/20
         "
       >
         <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 sm:text-sm">
               Pending
             </p>
 
@@ -510,11 +524,13 @@ const dueCount = tasks.filter(
           p-4
           shadow-sm
           sm:p-5
+          dark:border-orange-900/50
+dark:bg-orange-950/20
         "
       >
         <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 sm:text-sm">
               Due
             </p>
 
@@ -541,11 +557,13 @@ const dueCount = tasks.filter(
           p-4
           shadow-sm
           sm:p-5
+          dark:border-green-900/50
+dark:bg-green-950/20
         "
       >
         <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-medium text-slate-500 sm:text-sm">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 sm:text-sm">
               Completed
             </p>
 
@@ -566,9 +584,9 @@ const dueCount = tasks.filter(
     {/* RESULT COUNT */}
 
     <div className="flex items-center justify-between gap-3">
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-500 dark:text-slate-400">
         Showing{" "}
-        <span className="font-semibold text-slate-800">
+        <span className="font-semibold text-slate-800 dark:text-slate-200">
           {filteredTasks.length}
         </span>{" "}
         {filteredTasks.length === 1
@@ -591,6 +609,8 @@ const dueCount = tasks.filter(
             border-dashed
             border-slate-300
             bg-white
+            dark:border-slate-700
+            dark:bg-slate-900
             px-5
             py-10
             text-center
@@ -607,6 +627,7 @@ const dueCount = tasks.filter(
               justify-center
               rounded-2xl
               bg-slate-50
+              dark:bg-slate-800
             "
           >
             <CheckCircle2
@@ -615,11 +636,11 @@ const dueCount = tasks.filter(
             />
           </div>
 
-          <h2 className="mt-4 text-lg font-semibold text-slate-700">
+          <h2 className="mt-4 text-lg font-semibold text-slate-700 dark:text-slate-200">
             No tasks found
           </h2>
 
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
             {search
               ? "Try searching with a different keyword."
               : "There are no tasks in this category."}
@@ -649,12 +670,12 @@ const dueCount = tasks.filter(
                 sm:p-5
 
                 ${
-                  visuallyCompleted
-                    ? "border-green-200 bg-green-50/50"
-                    : task.status === "due"
-                    ? "border-orange-200 bg-white"
-                    : "border-slate-200 bg-white"
-                }
+  visuallyCompleted
+    ? "border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-950/30"
+    : task.status === "due"
+    ? "border-orange-200 bg-white dark:border-orange-900/60 dark:bg-slate-800"
+    : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"
+}
               `}
             >
 
@@ -714,6 +735,9 @@ const dueCount = tasks.filter(
                           border-2
                           border-slate-300
                           transition
+                          dark:border-slate-600
+                          dark:hover:border-blue-500
+                          dark:hover:bg-blue-950/40
                           hover:border-blue-500
                           hover:bg-blue-50
                         "
@@ -737,8 +761,8 @@ const dueCount = tasks.filter(
 
                         ${
                           visuallyCompleted
-                            ? "text-slate-400 line-through"
-                            : "text-slate-900"
+                            ? "text-slate-400 line-through dark:text-slate-500"
+                            : "text-slate-900 dark:text-slate-100"
                         }
                       `}
                     >
@@ -756,8 +780,8 @@ const dueCount = tasks.filter(
 
                           ${
                             visuallyCompleted
-                              ? "text-slate-400"
-                              : "text-slate-500"
+                              ? "text-slate-400 dark:text-slate-500"
+                              : "text-slate-500 dark:text-slate-400"
                           }
                         `}
                       >
@@ -778,6 +802,7 @@ const dueCount = tasks.filter(
                         gap-y-2
                         text-xs
                         text-slate-500
+                        dark:text-slate-400
                       "
                     >
                       <span className="flex items-center gap-1.5">
@@ -805,6 +830,7 @@ const dueCount = tasks.filter(
                     gap-2
                     border-t
                     border-slate-100
+                    dark:border-slate-700
                     pt-3
                     sm:w-auto
                     sm:shrink-0
@@ -829,6 +855,8 @@ const dueCount = tasks.filter(
                         text-xs
                         font-medium
                         text-green-600
+                        dark:bg-green-950/50
+                        dark:text-green-400
                       "
                     >
                       <CheckCircle2 size={14} />
@@ -849,6 +877,8 @@ const dueCount = tasks.filter(
                         text-xs
                         font-medium
                         text-orange-600
+                        dark:bg-orange-950/50
+                        dark:text-orange-400
                       "
                     >
                       <AlertCircle size={14} />
@@ -866,6 +896,8 @@ const dueCount = tasks.filter(
                         text-xs
                         font-medium
                         text-blue-600
+                        dark:bg-blue-950/50
+                        dark:text-blue-400
                       "
                     >
                       PENDING
@@ -898,6 +930,11 @@ const dueCount = tasks.filter(
                           hover:border-blue-200
                           hover:bg-blue-50
                           hover:text-blue-600
+                          dark:border-slate-700
+                          dark:text-slate-400
+                          dark:hover:border-blue-800
+                          dark:hover:bg-blue-950/40
+                          dark:hover:text-blue-400
                         "
                         title="Edit task"
                         aria-label="Edit task"
@@ -924,6 +961,11 @@ const dueCount = tasks.filter(
                           hover:border-red-200
                           hover:bg-red-50
                           hover:text-red-600
+                          dark:border-slate-700
+                          dark:text-slate-400
+                          dark:hover:border-red-900
+                          dark:hover:bg-red-950/40
+                          dark:hover:text-red-400
                         "
                         title="Delete task"
                         aria-label="Delete task"

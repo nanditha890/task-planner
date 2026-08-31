@@ -61,9 +61,9 @@ function Sidebar() {
     },
   ];
 
-  /* =================================================
-     LOGOUT
-  ================================================= */
+  // =====================================================
+  // LOGOUT
+  // =====================================================
 
   const handleLogout = async () => {
     try {
@@ -82,9 +82,9 @@ function Sidebar() {
     }
   };
 
-  /* =================================================
-     USER DISPLAY NAME
-  ================================================= */
+  // =====================================================
+  // USER DISPLAY NAME
+  // =====================================================
 
   const userName =
     user?.user_metadata?.full_name ||
@@ -94,19 +94,30 @@ function Sidebar() {
   const avatarLetter =
     userName.charAt(0).toUpperCase();
 
-  /* =================================================
-     NAVIGATION CONTENT
-  ================================================= */
+  // =====================================================
+  // SIDEBAR CONTENT
+  // =====================================================
 
   const SidebarContent = () => (
     <>
       {/* LOGO */}
 
-      <div className="mb-8 flex items-start justify-between">
-
+      <div
+        className="
+          mb-8
+          flex
+          items-start
+          justify-between
+        "
+      >
         <div>
-          <div className="flex items-center gap-3">
-
+          <div
+            className="
+              flex
+              items-center
+              gap-3
+            "
+          >
             <div
               className="
                 flex
@@ -123,21 +134,35 @@ function Sidebar() {
                 text-white
                 shadow-lg
                 shadow-blue-200
+                dark:shadow-none
               "
             >
               T
             </div>
 
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900">
+              <h1
+                className="
+                  text-xl
+                  font-bold
+                  tracking-tight
+                  text-slate-900
+                  dark:text-white
+                "
+              >
                 TaskFlow
               </h1>
 
-              <p className="text-xs text-slate-500">
+              <p
+                className="
+                  text-xs
+                  text-slate-500
+                  dark:text-slate-400
+                "
+              >
                 Plan. Do. Complete.
               </p>
             </div>
-
           </div>
         </div>
 
@@ -154,19 +179,19 @@ function Sidebar() {
             text-slate-500
             transition
             hover:bg-slate-100
+            dark:text-slate-400
+            dark:hover:bg-slate-800
             lg:hidden
           "
           aria-label="Close navigation"
         >
           <X size={21} />
         </button>
-
       </div>
 
       {/* NAVIGATION */}
 
       <nav className="flex-1 space-y-1.5">
-
         <p
           className="
             mb-3
@@ -176,6 +201,7 @@ function Sidebar() {
             uppercase
             tracking-[0.15em]
             text-slate-400
+            dark:text-slate-500
           "
         >
           Menu
@@ -209,8 +235,21 @@ function Sidebar() {
 
                   ${
                     isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-100"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      ? `
+                        bg-blue-600
+                        text-white
+                        shadow-md
+                        shadow-blue-100
+                        dark:shadow-none
+                      `
+                      : `
+                        text-slate-600
+                        hover:bg-slate-100
+                        hover:text-slate-900
+                        dark:text-slate-300
+                        dark:hover:bg-slate-800
+                        dark:hover:text-white
+                      `
                   }
                 `
               }
@@ -230,7 +269,12 @@ function Sidebar() {
                       ${
                         isActive
                           ? "bg-white/15"
-                          : "bg-slate-100 group-hover:bg-white"
+                          : `
+                            bg-slate-100
+                            group-hover:bg-white
+                            dark:bg-slate-800
+                            dark:group-hover:bg-slate-700
+                          `
                       }
                     `}
                   >
@@ -245,13 +289,19 @@ function Sidebar() {
             </NavLink>
           );
         })}
-
       </nav>
 
       {/* BOTTOM AREA */}
 
-      <div className="mt-5 border-t border-slate-200 pt-5">
-
+      <div
+        className="
+          mt-5
+          border-t
+          border-slate-200
+          pt-5
+          dark:border-slate-700
+        "
+      >
         {/* LOGOUT */}
 
         <button
@@ -272,6 +322,9 @@ function Sidebar() {
             transition
             hover:bg-red-50
             hover:text-red-600
+            dark:text-slate-300
+            dark:hover:bg-red-950/30
+            dark:hover:text-red-400
           "
         >
           <div
@@ -283,12 +336,15 @@ function Sidebar() {
               justify-center
               rounded-lg
               bg-slate-100
+              dark:bg-slate-800
             "
           >
             <LogOut size={18} />
           </div>
 
-          <span>Logout</span>
+          <span>
+            Logout
+          </span>
         </button>
 
         {/* PROFILE */}
@@ -314,9 +370,12 @@ function Sidebar() {
             duration-200
             hover:border-blue-200
             hover:bg-blue-50
+            dark:border-slate-700
+            dark:bg-slate-800
+            dark:hover:border-blue-800
+            dark:hover:bg-slate-700
           "
         >
-
           <div
             className="
               flex
@@ -342,20 +401,36 @@ function Sidebar() {
             )}
           </div>
 
-          <div className="min-w-0 flex-1">
-
-            <p className="truncate text-sm font-semibold text-slate-900">
+          <div
+            className="
+              min-w-0
+              flex-1
+            "
+          >
+            <p
+              className="
+                truncate
+                text-sm
+                font-semibold
+                text-slate-900
+                dark:text-white
+              "
+            >
               {userName}
             </p>
 
-            <p className="mt-0.5 text-xs text-slate-500">
+            <p
+              className="
+                mt-0.5
+                text-xs
+                text-slate-500
+                dark:text-slate-400
+              "
+            >
               View profile
             </p>
-
           </div>
-
         </button>
-
       </div>
     </>
   );
@@ -383,10 +458,11 @@ function Sidebar() {
           px-4
           shadow-sm
           backdrop-blur
+          dark:border-slate-800
+          dark:bg-slate-900/95
           lg:hidden
         "
       >
-
         <button
           type="button"
           onClick={() =>
@@ -405,14 +481,23 @@ function Sidebar() {
             text-slate-700
             transition
             hover:bg-slate-50
+            dark:border-slate-700
+            dark:bg-slate-800
+            dark:text-slate-200
+            dark:hover:bg-slate-700
           "
           aria-label="Open navigation"
         >
           <Menu size={21} />
         </button>
 
-        <div className="flex items-center gap-2">
-
+        <div
+          className="
+            flex
+            items-center
+            gap-2
+          "
+        >
           <div
             className="
               flex
@@ -431,10 +516,15 @@ function Sidebar() {
             T
           </div>
 
-          <span className="font-bold text-slate-900">
+          <span
+            className="
+              font-bold
+              text-slate-900
+              dark:text-white
+            "
+          >
             TaskFlow
           </span>
-
         </div>
 
         <button
@@ -452,6 +542,9 @@ function Sidebar() {
             bg-blue-50
             font-semibold
             text-blue-600
+            transition
+            dark:bg-blue-950/50
+            dark:text-blue-400
           "
           aria-label="Open profile"
         >
@@ -461,7 +554,6 @@ function Sidebar() {
             <User size={19} />
           )}
         </button>
-
       </header>
 
       {/* =================================================
@@ -479,7 +571,7 @@ function Sidebar() {
             fixed
             inset-0
             z-40
-            bg-slate-950/40
+            bg-slate-950/50
             backdrop-blur-[2px]
             lg:hidden
           "
@@ -511,6 +603,9 @@ function Sidebar() {
           duration-300
           ease-out
 
+          dark:border-slate-800
+          dark:bg-slate-900
+
           lg:hidden
 
           ${
@@ -541,6 +636,8 @@ function Sidebar() {
           border-slate-200
           bg-white
           p-5
+          dark:border-slate-800
+          dark:bg-slate-900
           lg:flex
         "
       >
